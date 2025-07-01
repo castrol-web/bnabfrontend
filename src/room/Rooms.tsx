@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { RiStarSLine } from "react-icons/ri";
 import { FaRegStarHalf } from "react-icons/fa";
 import { IoMdArrowDropright } from "react-icons/io";
@@ -6,7 +7,6 @@ import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import UseRoomStore from "../zustand/UseRoomStore";
 import { useCart } from "../context/CartContext";
-import { useEffect, useState } from "react";
 import Search from "../components/Search";
 
 const Rooms = () => {
@@ -17,7 +17,7 @@ const Rooms = () => {
 
   useEffect(() => {
     fetchRooms();
-  }, []);
+  }, [fetchRooms]);
 
   const isInCart = (id: string) => cart.some((item) => item._id === id);
 
@@ -170,7 +170,7 @@ const Rooms = () => {
                 <img
                   src={room.frontViewPicture}
                   alt="Room Front View"
-                  loading={index < 2 ? "eager" : "lazy"}
+                  
                   onLoad={() => setImgLoaded(true)}
                   className={`w-full h-full object-cover transition-opacity duration-500 ease-in-out ${imgLoaded ? "opacity-100 blur-0" : "opacity-0 blur-md"
                     }`}
