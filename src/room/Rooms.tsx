@@ -170,7 +170,7 @@ const Rooms = () => {
                 <img
                   src={room.frontViewPicture}
                   alt="Room Front View"
-                  
+                  loading={index < 2 ? "eager" : "lazy"}
                   onLoad={() => setImgLoaded(true)}
                   className={`w-full h-full object-cover transition-opacity duration-500 ease-in-out ${imgLoaded ? "opacity-100 blur-0" : "opacity-0 blur-md"
                     }`}
