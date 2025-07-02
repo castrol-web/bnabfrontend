@@ -7,7 +7,6 @@ import axios from "axios";
 import Header from "../components/Header";
 import GoogleMapEmbeded from "../components/GoogleMapEmbeded";
 import { useTranslation } from "react-i18next";
-
 const url = import.meta.env.VITE_SERVER_URL;
 
 const Contact = () => {
