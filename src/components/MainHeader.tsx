@@ -5,7 +5,6 @@ import chemka from "../assets/chemka.jpg";
 import park from "../assets/park.jpg";
 import { useTranslation } from "react-i18next";
 
-
 function MainHeader() {
   const [index, setIndex] = useState(0);
   const { t } = useTranslation();
@@ -13,16 +12,16 @@ function MainHeader() {
 
   const content = [
     {
-      heading: t("Welcome to B&B Hotel"),
-      text: t("Discover comfort, peace, and warm hospitality in the heart of Moshi."),
+      heading: "Welcome to B&B Hotel",
+      text: "Discover comfort, peace, and warm hospitality in the heart of Moshi.",
     },
     {
-      heading: t("Your Home Away From Home"),
-      text: t("Enjoy cozy beds, fresh breakfasts, and breathtaking views of Mount Kilimanjaro."),
+      heading: "Your Home Away From Home",
+      text: "Enjoy cozy beds, fresh breakfasts, and breathtaking views of Mount Kilimanjaro.",
     },
     {
-      heading: t( "Experience Tranquility"),
-      text: t("Unwind in nature, indulge in delicious cuisine, and explore hidden gems nearby."),
+      heading: "Experience Tranquility",
+      text: "Unwind in nature, indulge in delicious cuisine, and explore hidden gems nearby.",
     },
   ];
 
