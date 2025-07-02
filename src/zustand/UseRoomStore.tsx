@@ -34,7 +34,7 @@ const UseRoomStore = create<RoomState>((set) => ({
         set({ loading: true });
         try {
             const response = await axios.get(`${url}/api/user/rooms`)
-            if (response.status === 201) {
+            if (response.status === 200) {
                 set({ rooms: response.data });
             }
         } catch (error: any) {

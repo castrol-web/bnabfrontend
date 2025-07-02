@@ -31,7 +31,7 @@ function Navbar() {
       <div className="bg-[#E88A1A] text-sm py-2 px-4 flex justify-between items-center lg:px-28 text-black">
         <p>
           {t("Contact us")}:{" "}
-          <span className="font-medium pl-1">+255 657 849 224</span>
+          <span className="font-medium pl-1">+255764338937</span>
         </p>
         <select
           title="select language"

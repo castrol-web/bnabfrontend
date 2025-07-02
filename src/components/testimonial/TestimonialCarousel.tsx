@@ -57,13 +57,13 @@ export const TestimonialCarousel = () => {
   if (!testimonials.length) return <div className="text-center py-10">{t("Loading testimonials...")}</div>;
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto px-4 py-10">
+    <div className="relative w-full max-w-5xl mx-auto px-4 pt-10">
       <div className="text-center mb-6">
         <h2 className="text-3xl font-bold text-blue-600">{t("What Our Clients Say")}</h2>
         <p className="text-gray-500">{t("Real stories from our happy customers")}</p>
       </div>
 
-      <div className="relative min-h-[320px]">
+      <div className="relative lg:min-h-[350px] min-h-[600px]">
         <AnimatePresence initial={false} mode="wait">
           <motion.div
             key={current}

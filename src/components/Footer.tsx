@@ -1,9 +1,7 @@
 import {
   FaFacebook,
-  FaTwitter,
-  FaYoutube,
+  FaWhatsapp,
   FaInstagram,
-  FaSnapchat,
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -13,8 +11,8 @@ function Footer() {
   const { t } = useTranslation();
 
   return (
-    <div className="mt-32 w-full z-50">
-      <div className="max-w-7xl mx-auto px-4 pb-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+    <div className="mt-15 w-full z-50">
+      <div className="max-w-7xl mx-auto px-4 pb-6 grid grid-cols-1 md:grid-cols-3 gap-8  items-center justify-center text-center">
         {/* Navigation */}
         <div>
           <h2 className="text-lg font-bold text-white mb-3">{t("Navigation")}</h2>
@@ -29,34 +27,30 @@ function Footer() {
         <div>
           <h2 className="text-lg font-bold text-white mb-3">B&B hotel</h2>
           <p><span className="pr-4">{t("Location")}:</span> Moshi, Tanzania</p>
-          <p className="mt-1">{t("Phone")}: +255 111 333 345</p>
+          <p className="mt-1">{t("Phone")}: +255764338937</p>
           <p>
             {t("Email")}:{" "}
-            <a href="mailto:bnb@hotel.com" className="text-blue-400 hover:underline">
-              B&B@hotel.com
+            <a href="mailto:bnabhotel@gmail.com" className="text-blue-400 hover:underline">
+              bnabhotel@gmail.com
             </a>
           </p>
         </div>
 
         {/* Socials */}
-        <div>
-          <h2 className="text-lg font-bold text-white mb-3">{t("Follow Us")}</h2>
+        <div className="items-center justify-center text-center mx-auto">
+          <h2 className="text-lg font-bold text-white mb-3 text-center">{t("Follow Us")}</h2>
           <div className="flex justify-center md:justify-start space-x-4">
-            <a href="/facebook" aria-label="Facebook">
-              <FaFacebook className="text-2xl hover:text-orange-400" />
+            <a href="https://www.facebook.com/share/1ETv8qDcU8/?mibextid=wwXIfr" aria-label="Facebook">
+              <FaFacebook className="text-2xl text-blue-800 hover:text-blue-400" />
             </a>
-            <a href="/twitter" aria-label="Twitter">
-              <FaTwitter className="text-2xl hover:text-orange-400" />
+            <a href="https://wa.me/+255764338937" aria-label="Whatsapp">
+              <FaWhatsapp className="text-2xl hover:text-green-700 text-green-800" />
             </a>
-            <a href="/youtube" aria-label="YouTube">
-              <FaYoutube className="text-2xl hover:text-orange-400" />
-            </a>
-            <a href="/instagram" aria-label="Instagram">
-              <FaInstagram className="text-2xl hover:text-orange-400" />
-            </a>
-            <a href="/snapchat" aria-label="Snapchat">
-              <FaSnapchat className="text-2xl hover:text-orange-400" />
-            </a>
+            <div className="bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] rounded-lg p-1">
+              <a href="https://www.instagram.com/bbhotel88?igsh=OHQ4eHBhMXQ5eWtp" aria-label="Instagram">
+                <FaInstagram className="text-xl text-white hover:text-slate-50" />
+              </a>
+            </div>
           </div>
         </div>
       </div>

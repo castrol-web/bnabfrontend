@@ -163,16 +163,16 @@ const Contact = () => {
                 placeholder={t("contact.messagePlaceholder")}
               />
             </div>
-
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               type="submit"
-              className="btn btn-primary w-full"
+              className="btn btn-primary w-full min-w-[120px] disabled:opacity-100"
               disabled={loading}
             >
-              {!loading ? t("contact.send") : t("contact.sending")}
+              {!loading ? t("contact.send") : <p className="text-blue-900"><span className="loading loading-spinner loading-sm"></span>{t("contact.sending")}</p>}
             </motion.button>
+
           </motion.form>
         </div>
       </section>

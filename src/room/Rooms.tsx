@@ -19,7 +19,7 @@ const Rooms = () => {
 
   useEffect(() => {
     fetchRooms();
-  }, [fetchRooms]);
+  }, []);
 
   const isInCart = (id: string) => cart.some((item) => item._id === id);
 

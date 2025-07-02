@@ -109,7 +109,7 @@ const GalleryManager: React.FC = () => {
     };
 
     return (
-        <div className="p-4 sm:p-6 mt-32 text-white">
+        <div className="p-4 sm:p-6 text-white">
             <h1 className="text-2xl sm:text-3xl font-bold mb-4">Gallery Management</h1>
             <button
                 className="btn btn-primary flex items-center gap-2 mb-4"

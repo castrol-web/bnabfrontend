@@ -66,6 +66,7 @@ const RoomManager: React.FC = () => {
             if (response.status === 200) {
                 setRooms(response.data);
             }
+            console.log(response.data)
         } catch (error: any) {
             const msg = error?.response?.data?.message;
             if (error.response?.status === 404 && msg) {
@@ -210,8 +211,8 @@ const RoomManager: React.FC = () => {
     }, []);
 
     return (
-        <div className="p-4 sm:p-6 text-white mt-32">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-4">{t("Room Management")}</h1>
+        <div className="p-4 sm:p-6 text-black">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-slate-300">{t("Room Management")}</h1>
             <button className="btn btn-primary flex items-center gap-2 mb-4" onClick={() => {
                 setEditingRoom(null);
                 reset(defaultValues);
@@ -227,32 +228,56 @@ const RoomManager: React.FC = () => {
             ) : rooms.length === 0 ? (
                 <div className="text-center text-gray-400 py-10 text-lg">{t("No rooms available.")}</div>
             ) : (
-                <div className="overflow-x-auto rounded-xl border border-base-300 shadow-sm bg-white text-black">
-                    <table className="table w-full text-sm sm:text-base">
-                        <thead className="bg-base-200">
+                <div className="overflow-x-auto rounded-lg bg-white shadow-md">
+                    <table className="table w-full text-sm">
+                        <thead className="bg-gray-900 text-white">
                             <tr>
-                                <th className="text-left px-4 py-2">{t("Title")}</th>
-                                <th className="text-left px-4 py-2">{t("Room #")}</th>
-                                <th className="text-left px-4 py-2">{t("Price")}</th>
-                                <th className="text-left px-4 py-2">{t("Max People")}</th>
-                                <th className="text-left px-4 py-2">{t("Status")}</th>
-                                <th className="text-center px-4 py-2">{t("Actions")}</th>
+                                <th className="text-left px-4 py-3">{t("Title")}</th>
+                                <th className="text-left px-4 py-3">{t("Room #")}</th>
+                                <th className="text-left px-4 py-3">{t("Price")}</th>
+                                <th className="text-left px-4 py-3">{t("Max People")}</th>
+                                <th className="text-left px-4 py-3">{t("Status")}</th>
+                                <th className="text-center px-4 py-3">{t("Actions")}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {rooms.map((room) => (
-                                <tr key={room._id} className="hover:bg-gray-100">
-                                    <td className="px-4 py-2">{room.title}</td>
-                                    <td className="px-4 py-2">{room.roomNumber}</td>
-                                    <td className="px-4 py-2">${room.price}</td>
-                                    <td className="px-4 py-2">{room.maxPeople}</td>
-                                    <td className="px-4 py-2">
-                                        <span className={`${room.status === 'available' ? 'text-green-600' : room.status === 'booked' ? 'text-orange-400' : 'text-red-600'}`}>{t(room.status)}</span>
+                            {rooms.map((room, index) => (
+                                <tr
+                                    key={room._id}
+                                    className={`${index % 2 === 0 ? "bg-white text-black" : "bg-black text-white"
+                                        } hover:bg-gray-700 transition-colors`}
+                                >
+                                    <td className="px-4 py-3">{room.title}</td>
+                                    <td className="px-4 py-3">{room.roomNumber}</td>
+                                    <td className="px-4 py-3">${room.price}</td>
+                                    <td className="px-4 py-3">{room.maxPeople}</td>
+                                    <td className="px-4 py-3">
+                                        <span
+                                            className={`font-medium ${room.status === "available"
+                                                    ? "text-green-500"
+                                                    : room.status === "booked"
+                                                        ? "text-yellow-400"
+                                                        : "text-red-500"
+                                                }`}
+                                        >
+                                            {t(room.status)}
+                                        </span>
                                     </td>
-                                    <td className="px-4 py-2 text-center">
+                                    <td className="px-4 py-3 text-center">
                                         <div className="flex justify-center gap-2">
-                                            <button className="btn btn-sm btn-outline" onClick={() => handleEdit(room)}><AiOutlineEdit /></button>
-                                            <button disabled={loading} className="btn btn-sm btn-error text-white" onClick={() => handleDelete(room._id!)}>{!loading ? <AiOutlineDelete /> : t("deleting..")}</button>
+                                            <button
+                                                className="btn btn-sm btn-outline btn-info"
+                                                onClick={() => handleEdit(room)}
+                                            >
+                                                <AiOutlineEdit />
+                                            </button>
+                                            <button
+                                                disabled={loading}
+                                                className="btn btn-sm btn-error text-white"
+                                                onClick={() => handleDelete(room._id!)}
+                                            >
+                                                {!loading ? <AiOutlineDelete /> : t("deleting..")}
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -260,6 +285,8 @@ const RoomManager: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
+
+
             )}
 
             {showModal && (
