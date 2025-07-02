@@ -65,7 +65,7 @@ const Signup = () => {
     const phoneRegex = /^\+?\d{7,15}$/;
     const usernameRegex = /^[a-zA-Z0-9_]{3,}$/;
 
-    if (!signupData.userName || !signupData.email || !signupData.password) {
+    if (!signupData.userName || !signupData.email || !signupData.password || !signupData.phone || !signupData.password || !signupData.nationality) {
       toast.warning(t("Please fill in all required fields."));
       return;
     }

@@ -30,7 +30,7 @@ const defaultValues = {
     price: 0,
     maxPeople: 1,
     numberOfBeds: 1,
-    roomType: 'Classic',
+    roomType: 'Single',
     status: 'available',
     amenities: [],
     frontViewPicture: '',
@@ -38,9 +38,9 @@ const defaultValues = {
 };
 
 const AmenityChoices = [
-    "Room 72m²", "Double Beds", "Free Beach", "Fridge/Bar", "Microwave", "Smart TV", "Sauna", "Room Service",
-    "AC", "Booking", "Concrete Flooring", "Storage", "Outdoor Kitchen", "Towels", "Tennis Courts", "Trees & Landscaping",
-    "Balcony", "Cable TV", "Family Room", "Shower", "Breakfast", "Ironing", "Soundproof", "Dryer",
+    "Room 72m²","Room 20m²","Room 26m²","Toothbrush","Shampoo","Slippers","Room 16m²","Room 24m²","Room 28m²", "Double Beds","Single Bed","Tripple", "Free Beach", "Smart TV", "Sauna", "Room Service","Bath tab",
+    "AC", "Booking", "Storage", "Outdoor Kitchen", "Towels", "Tennis Courts", "Trees & Landscaping",
+    "Big Wardrobe", "Cable TV", "Family Room", "Shower", "Breakfast", "Ironing", "Soundproof", "Dryer",
 ];
 
 const RoomManager: React.FC = () => {
@@ -254,10 +254,10 @@ const RoomManager: React.FC = () => {
                                     <td className="px-4 py-3">
                                         <span
                                             className={`font-medium ${room.status === "available"
-                                                    ? "text-green-500"
-                                                    : room.status === "booked"
-                                                        ? "text-yellow-400"
-                                                        : "text-red-500"
+                                                ? "text-green-500"
+                                                : room.status === "booked"
+                                                    ? "text-yellow-400"
+                                                    : "text-red-500"
                                                 }`}
                                         >
                                             {t(room.status)}
@@ -385,11 +385,12 @@ const RoomManager: React.FC = () => {
                                     <div>
                                         <label className="label">{t("Room Type")}</label>
                                         <select className="select select-bordered w-full" {...register('roomType')}>
-                                            <option value="Classic">{t("Classic")}</option>
-                                            <option value="Deluxe">{t("Deluxe")}</option>
-                                            <option value="Suite">{t("Suite")}</option>
+                                            <option value="Tripple">{t("Tripple")}</option>
+                                            <option value="Small Double">{t("Small Double")}</option>
+                                            <option value="Twin">{t("Twin")}</option>
                                             <option value="Single">{t("Single")}</option>
                                             <option value="Double">{t("Double")}</option>
+                                            <option value="Family">{t("Family")}</option>
                                         </select>
                                     </div>
                                     <div>
