@@ -8,8 +8,10 @@ import Header from "../components/Header";
 import UseRoomStore from "../zustand/UseRoomStore";
 import { useCart } from "../context/CartContext";
 import Search from "../components/Search";
+import { useTranslation } from "react-i18next";
 
 const Rooms = () => {
+  const { t } = useTranslation();
   const { rooms, loading, fetchRooms } = UseRoomStore();
   const [imgLoaded, setImgLoaded] = useState(false);
   const { cart, addToCart, removeFromCart } = useCart();
@@ -34,7 +36,7 @@ const Rooms = () => {
 
   return (
     <div className="mt-28">
-      <Header pageName="Our Rooms" />
+      <Header pageName={t("Our Rooms")} />
       <Search />
 
       {loading ? (
@@ -61,8 +63,9 @@ const Rooms = () => {
         rooms.map((room, index) => (
           <div
             key={room._id || index}
-            className={`flex flex-col-reverse mx-auto ${index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
-              } items-center justify-between gap-10 mt-10 lg:px-20 px-8`}
+            className={`flex flex-col-reverse mx-auto ${
+              index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
+            } items-center justify-between gap-10 mt-10 lg:px-20 px-8`}
           >
             <motion.div
               className="hidden lg:flex w-16 h-[150px] items-center justify-center border-2"
@@ -71,7 +74,7 @@ const Rooms = () => {
               transition={{ duration: 0.5 }}
             >
               <p className="transform -rotate-90 text-xs text-gray-600 tracking-wide">
-                {room.roomType?.toUpperCase() || "ROOM"}{" "}
+                {(room.roomType?.toUpperCase() || t("ROOM")) + " "}
                 <span className="ml-4 font-semibold">{index + 1}</span>
               </p>
             </motion.div>
@@ -95,36 +98,36 @@ const Rooms = () => {
 
               <h2 className="text-3xl font-bold mb-2">{room.title}</h2>
               <p className="text-gray-600 mb-2">
-                Starting from{" "}
+                {t("Starting from")}{" "}
                 <span className="text-red-600 text-2xl font-semibold">
                   ${room.price}/
                 </span>
-                night
+                {t("night")}
               </p>
               <p className="text-gray-500 text-sm mb-4 break-words max-w-full md:max-w-2xl lg:max-w-3xl flex-1">
                 {room.description}
               </p>
               <div className="text-sm text-gray-600 space-y-1 mb-4">
                 <p>
-                  Status:{" "}
+                  {t("Status")}:{" "}
                   <span
-                    className={`font-medium ${room.status === "available"
+                    className={`font-medium ${
+                      room.status === "available"
                         ? "text-green-600"
                         : room.status === "booked"
-                          ? "text-orange-400"
-                          : "text-red-600"
-                      }`}
+                        ? "text-orange-400"
+                        : "text-red-600"
+                    }`}
                   >
-                    {room.status}
+                    {t(room.status)}
                   </span>
                 </p>
                 <p>
-                  Deposit:{" "}
-                  <span className="text-gray-700">Not required</span>
+                  {t("Deposit")}:{" "}
+                  <span className="text-gray-700">{t("Not required")}</span>
                 </p>
                 <p>
-                  Beds:{" "}
-                  <span className="text-gray-700">{room.numberOfBeds}</span>
+                  {t("Beds")}: <span className="text-gray-700">{room.numberOfBeds}</span>
                 </p>
               </div>
 
@@ -132,19 +135,20 @@ const Rooms = () => {
                 to={`/room-details/${room._id}`}
                 className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium mb-2"
               >
-                View Details <IoMdArrowDropright className="ml-1" />
+                {t("View Details")} <IoMdArrowDropright className="ml-1" />
               </Link>
 
               <div className="flex gap-4 flex-wrap mt-2">
                 <button
                   type="button"
                   onClick={handleToggleCart(room)}
-                  className={`btn font-semibold rounded-full transition ${isInCart(room._id)
+                  className={`btn font-semibold rounded-full transition ${
+                    isInCart(room._id)
                       ? "bg-red-600 hover:bg-red-700"
                       : "bg-green-600 hover:bg-green-700"
-                    } text-white`}
+                  } text-white`}
                 >
-                  {isInCart(room._id) ? "Remove from Cart" : "Add to Cart"}
+                  {isInCart(room._id) ? t("Remove from Cart") : t("Add to Cart")}
                 </button>
 
                 <button
@@ -152,7 +156,7 @@ const Rooms = () => {
                   onClick={() => handleBookNow(room)}
                   className="btn btn-success font-semibold rounded-full text-white"
                 >
-                  Book Now
+                  {t("Book Now")}
                 </button>
               </div>
             </motion.div>
@@ -169,11 +173,12 @@ const Rooms = () => {
                 )}
                 <img
                   src={room.frontViewPicture}
-                  alt="Room Front View"
+                  alt={t("Room Front View")}
                   loading={index < 2 ? "eager" : "lazy"}
                   onLoad={() => setImgLoaded(true)}
-                  className={`w-full h-full object-cover transition-opacity duration-500 ease-in-out ${imgLoaded ? "opacity-100 blur-0" : "opacity-0 blur-md"
-                    }`}
+                  className={`w-full h-full object-cover transition-opacity duration-500 ease-in-out ${
+                    imgLoaded ? "opacity-100 blur-0" : "opacity-0 blur-md"
+                  }`}
                 />
               </figure>
             </motion.div>
@@ -181,9 +186,7 @@ const Rooms = () => {
         ))
       ) : (
         !loading && (
-          <p className="text-center text-gray-500 mt-10">
-            No rooms available at the moment.
-          </p>
+          <p className="text-center text-gray-500 mt-10">{t("No rooms available at the moment.")}</p>
         )
       )}
     </div>

@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function NotFound() {
     const navigate = useNavigate();
+    const {t} = useTranslation();
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-base-200 px-4">
@@ -17,16 +19,16 @@ export default function NotFound() {
                     <FaExclamationTriangle />
                 </div>
 
-                <h1 className="text-4xl font-bold mb-2 text-gray-800">404 - Page Not Found</h1>
+                <h1 className="text-4xl font-bold mb-2 text-gray-800">{t("404 - Page Not Found")}</h1>
                 <p className="text-gray-500 mb-6">
-                    The page you’re looking for doesn’t exist or has been moved.
+                    {t("The page you're looking for doesn't exist or has been moved.")}
                 </p>
 
                 <button
                     onClick={() => navigate("/")}
                     className="btn btn-primary btn-wide"
                 >
-                    Go Back Home
+                   {t(" Go Back Home")}
                 </button>
             </motion.div>
         </div>

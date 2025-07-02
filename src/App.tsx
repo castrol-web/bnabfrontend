@@ -15,6 +15,8 @@ import Signup from "./signup/Signup";
 import VerifyEmail from "./verify/VerifyEmail";
 import NotFound from "./components/Notfound/NotFound";
 import ScrollToTop from "./components/scroll/ScrollToTop";
+import Gallery from "./components/gallery/Gallery";
+import GalleryManager from "./Admin/Rooms/gallery/GalleryManager";
 function App() {
   return (
     <div className="bg-[#0f0c0c] min-h-screen text-[#FFF0DC]">
@@ -29,8 +31,10 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin/room-management" element={<RoomManager />} />
+          <Route path="/admin/gallery-management" element={<GalleryManager />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
         </Routes>

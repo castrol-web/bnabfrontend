@@ -5,8 +5,11 @@ import { DateRange, type RangeKeyDict } from "react-date-range";
 import { format, isBefore } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
+import { useTranslation } from "react-i18next";
 
 const Search = () => {
+  const { t } = useTranslation();
+
   const [state, setState] = useState([
     {
       startDate: new Date(),
@@ -44,34 +47,33 @@ const Search = () => {
   const handleCheckAvailability = () => {
     const { startDate, endDate } = state[0];
     if (!isBefore(startDate, endDate)) {
-      setError("Check-out date must be after check-in.");
+      setError(t("Check-out date must be after check-in."));
       return;
     }
     setError("");
     toast.info(
-      `Booking from ${format(startDate, "PPP")} to ${format(
-        endDate,
-        "PPP"
-      )} for ${adults} adults and ${kids} kids. Discount: ${discount}%`
+      t("Booking from {{start}} to {{end}} for {{adults}} adults and {{kids}} kids. Discount: {{discount}}%", {
+        start: format(startDate, "PPP"),
+        end: format(endDate, "PPP"),
+        adults,
+        kids,
+        discount,
+      })
     );
   };
 
   return (
     <div className="relative opacity-75 z-20 w-full max-w-4xl mx-auto p-4 rounded-lg shadow">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-
         {/* Date Picker */}
         <div className="relative col-span-1">
-          <label className="block text-sm mb-1">Check-in - Check-out</label>
+          <label className="block text-sm mb-1">{t("Check-in - Check-out")}</label>
           <button
             type="button"
             onClick={() => setShowCalendar(!showCalendar)}
             className="w-full px-3 py-2 border rounded text-sm text-left"
           >
-            {`${format(state[0].startDate, "MMM dd")} - ${format(
-              state[0].endDate,
-              "MMM dd, yyyy"
-            )}`}
+            {`${format(state[0].startDate, "MMM dd")} - ${format(state[0].endDate, "MMM dd, yyyy")}`}
           </button>
           {showCalendar && (
             <div className="absolute z-30 mt-2 shadow-lg">
@@ -90,9 +92,9 @@ const Search = () => {
         {/* Adults & Kids */}
         <div className="flex gap-4 flex-wrap">
           <div className="flex-1 min-w-[120px]">
-            <label className="block text-sm mb-1">Adults</label>
+            <label className="block text-sm mb-1">{t("Adults")}</label>
             <select
-              title="select number"
+              title={t("Select number of adults")}
               className="w-full border rounded px-3 py-2 text-sm"
               value={adults}
               onChange={(e) => setAdults(parseInt(e.target.value))}
@@ -104,9 +106,9 @@ const Search = () => {
           </div>
 
           <div className="flex-1 min-w-[120px]">
-            <label className="block text-sm mb-1">Kids</label>
+            <label className="block text-sm mb-1">{t("Kids")}</label>
             <select
-              title="select number"
+              title={t("Select number of kids")}
               className="w-full border rounded px-3 py-2 text-sm"
               value={kids}
               onChange={(e) => setKids(parseInt(e.target.value))}
@@ -120,10 +122,10 @@ const Search = () => {
 
         {/* Promo Code */}
         <div>
-          <label className="block text-sm mb-1">Promo Code</label>
+          <label className="block text-sm mb-1">{t("Promo Code")}</label>
           <input
             type="text"
-            placeholder="Enter code"
+            placeholder={t("Enter code")}
             className="w-full border rounded px-3 py-2 text-sm"
             value={promoCode}
             onChange={(e) => {
@@ -133,7 +135,7 @@ const Search = () => {
           />
           {discount > 0 && (
             <p className="text-green-500 text-xs mt-1">
-              ✅ {discount}% discount applied!
+              ✅ {t("{{discount}}% discount applied!", { discount })}
             </p>
           )}
         </div>
@@ -146,7 +148,7 @@ const Search = () => {
           onClick={handleCheckAvailability}
           className="bg-[#F2910A] px-6 py-2 rounded text-sm hover:bg-blue-700 transition"
         >
-          Check Availability
+          {t("Check Availability")}
         </button>
       </div>
 

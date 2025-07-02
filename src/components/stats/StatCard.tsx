@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import CountUp from "react-countup";
 import { motion, useInView } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 type statType = {
     icon: any;
@@ -13,6 +14,7 @@ type statType = {
 function StatCard({ icon: Icon, end, title, description, color = "text-blue-500" }: statType) {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, amount: 0.6 });
+    const { t } = useTranslation();
 
     return (
         <motion.div
@@ -28,8 +30,8 @@ function StatCard({ icon: Icon, end, title, description, color = "text-blue-500"
             <h3 className="text-3xl font-bold mb-2">
                 {isInView && <CountUp end={end} duration={2} />}+
             </h3>
-            <h4 className="text-xl font-semibold">{title}</h4>
-            <p className="text-sm mt-2">{description}</p>
+            <h4 className="text-xl font-semibold">{t(title)}</h4>
+            <p className="text-sm mt-2">{t(description)}</p>
         </motion.div>
     );
 }

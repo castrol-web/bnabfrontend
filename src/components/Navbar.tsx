@@ -3,34 +3,46 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { IoMdMenu, IoMdClose } from "react-icons/io";
 import hotellogo from "../assets/hotellogo.jpg";
 import { useCart } from "../context/CartContext";
+import { useTranslation } from "react-i18next";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const navigate = useNavigate();
+  const { cart } = useCart();
+  const { t, i18n } = useTranslation();
+
+  // Language switch handler
+  const handleLangChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    i18n.changeLanguage(e.target.value);
+  };
 
   const navLinks = [
-    { name: "HOME", to: "/" },
-    { name: "OUR ROOMS", to: "/our-rooms" },
-    { name: "ABOUT", to: "/about" },
-    { name: "CONTACT US", to: "/contact" },
-    { name: "ADVENTURES", to: "/adventures" },
+    { name: t("HOME"), to: "/" },
+    { name: t("OUR ROOMS"), to: "/our-rooms" },
+    { name: t("ABOUT"), to: "/about" },
+    { name: t("CONTACT US"), to: "/contact" },
+    { name: t("ADVENTURES"), to: "/adventures" },
   ];
-
-  const { cart } = useCart();
 
   return (
     <div className="w-full shadow-sm z-50 fixed mb-10 top-0">
       {/* Top Info Bar */}
       <div className="bg-[#E88A1A] text-sm py-2 px-4 flex justify-between items-center lg:px-28 text-black">
         <p>
-          Contact us: <span className="font-medium pl-1">+255 657 849 224</span>
+          {t("Contact us")}:{" "}
+          <span className="font-medium pl-1">+255 657 849 224</span>
         </p>
-        <select title="select language" className="select w-20">
-          <option value="ENG">ENG</option>
-          <option value="GER">GER</option>
-          <option value="Dutch">Dutch</option>
-          <option value="FR">FR</option>
+        <select
+          title="select language"
+          className="select w-20"
+          onChange={handleLangChange}
+          value={i18n.language}
+        >
+          <option value="en">ENG</option>
+          <option value="de">GER</option>
+          <option value="nl">Dutch</option>
+          <option value="fr">FR</option>
         </select>
       </div>
 
@@ -38,22 +50,20 @@ function Navbar() {
 
       {/* Navbar Main */}
       <div className="navbar bg-[#131010] flex justify-between items-center">
-        {/* Left: Logo */}
         <div className="text-2xl font-bold text-primary">
           <NavLink to="/">
             <img
-              alt={`${hotellogo}`}
+              alt="Hotel Logo"
               src={hotellogo}
               className="rounded-full h-12 w-12"
             />
           </NavLink>
         </div>
 
-        {/* Center: Desktop Nav Links */}
         <div className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2">
           <ul className="menu menu-horizontal px-1 gap-4 font-medium">
             {navLinks.map((link) => (
-              <li key={link.name}>
+              <li key={link.to}>
                 <NavLink
                   to={link.to}
                   className={({ isActive }) =>
@@ -69,7 +79,7 @@ function Navbar() {
           </ul>
         </div>
 
-        {/* Right: Cart + Hamburger */}
+        {/* Cart + Hamburger */}
         <div className="flex items-center gap-2">
           {/* Cart Icon */}
           <div className="dropdown dropdown-end">
@@ -97,10 +107,11 @@ function Navbar() {
               className="mt-3 card card-compact dropdown-content w-64 bg-base-100 shadow"
             >
               <div className="card-body">
-                <span className="font-bold text-lg text-black">{cart.length} {cart.length > 1 ? "Rooms" : "Room"}</span>
+                <span className="font-bold text-lg text-black">
+                  {cart.length} {cart.length > 1 ? t("Rooms") : t("Room")}
+                </span>
                 <span className="text-info">
-                  Subtotal: $
-                  {cart.reduce((acc, item) => acc + item.price, 0)}
+                  {t("Subtotal")}: ${cart.reduce((acc, item) => acc + item.price, 0)}
                 </span>
                 <div className="card-actions flex flex-col gap-2">
                   <button
@@ -109,7 +120,7 @@ function Navbar() {
                     onClick={() => navigate("/checkout")}
                     disabled={cart.length === 0}
                   >
-                    Go to Checkout
+                    {t("Go to Checkout")}
                   </button>
                 </div>
               </div>
@@ -137,7 +148,7 @@ function Navbar() {
         <div className="w-full px-4 py-4 shadow-md flex flex-col gap-2 lg:hidden bg-[#131010]">
           {navLinks.map((link) => (
             <NavLink
-              key={link.name}
+              key={link.to}
               to={link.to}
               className={({ isActive }) =>
                 isActive

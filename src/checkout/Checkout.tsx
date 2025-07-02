@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "../hooks/UseAuth";
 import EmptyCart from "../context/EmptyCart";
 const url = import.meta.env.VITE_SERVER_URL;
+import { useTranslation } from "react-i18next";
 
 interface Room {
   _id: string;
@@ -41,6 +42,7 @@ function Checkout() {
   const roomsToBook: Room[] = directBooking ? [roomFromDirect!] : cart;
   const { isAuthenticated, LoadingUser, user } = useAuth();
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
 
   useEffect(() => {
@@ -151,7 +153,7 @@ function Checkout() {
 
   return (
     <div className="px-6 lg:px-32 mt-32 mx-auto">
-      <h1 className="text-3xl font-semibold mb-6 text-center justify-center">Checkout</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center justify-center">{t("Checkout")}</h1>
 
       {roomsToBook.map((item) => {
         const range = dateRanges[item._id]?.[0];
@@ -163,12 +165,12 @@ function Checkout() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <h2 className="text-xl font-bold mb-2">{item.title}</h2>
-            <p className="text-sm text-gray-500 mb-2">{item.roomType}</p>
-            <p className="text-sm text-gray-400">Max people: {item.maxPeople}</p>
+            <h2 className="text-xl font-bold mb-2">{t(item.title)}</h2>
+            <p className="text-sm text-gray-500 mb-2">{t(item.roomType)}</p>
+            <p className="text-sm text-gray-400">{t("Max people")}: {item.maxPeople}</p>
 
             <label className="block mt-2 text-sm font-medium text-gray-700">
-              Number of Guests
+             {t("Number of Guests")} 
             </label>
             <input
               type="number"
@@ -182,7 +184,7 @@ function Checkout() {
             />
 
             <div className="relative mt-4">
-              <label className="block text-sm mb-1">Check-in - Check-out</label>
+              <label className="block text-sm mb-1">{t("Check-in - Check-out")}</label>
               <button
                 type="button"
                 onClick={() =>
@@ -215,13 +217,13 @@ function Checkout() {
             </div>
 
             <div className="mt-4 flex justify-between items-center">
-              <span className="text-lg font-semibold">${item.price}/night</span>
+              <span className="text-lg font-semibold">${item.price}{t("/night")}</span>
               {!directBooking && (
                 <button
                   onClick={() => removeFromCart(item._id)}
                   className="text-red-500 hover:text-red-700 font-medium"
                 >
-                  Remove
+                 {t("Remove")} 
                 </button>
               )}
             </div>
@@ -230,7 +232,7 @@ function Checkout() {
       })}
 
       <div className="p-4 rounded mt-6">
-        <h2 className="text-lg font-semibold mb-2">Summary</h2>
+        <h2 className="text-lg font-semibold mb-2">{t("Summary")}</h2>
         <ul className="space-y-2 text-sm">
           {roomsToBook.map((room) => {
             const range = dateRanges[room._id]?.[0];
@@ -246,7 +248,7 @@ function Checkout() {
         </ul>
 
         <div className="text-right mt-4 font-semibold text-lg">
-          Total: $
+          {t("")}Total: $
           {roomsToBook.reduce((sum, room) => {
             const range = dateRanges[room._id]?.[0];
             if (!range?.startDate || !range?.endDate) return sum;
@@ -293,23 +295,23 @@ function Checkout() {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="bg-white max-w-md w-full p-6 rounded shadow-lg">
             <Dialog.Title className="text-xl font-semibold mb-4">
-              Confirm Booking
+             {t("Confirm Booking")} 
             </Dialog.Title>
-            <p className="mb-6">Are you sure you want to confirm your booking?</p>
+            <p className="mb-6">{t("Are you sure you want to confirm your booking?")}</p>
             <div className="flex justify-end gap-4">
               <button
                 type="button"
                 onClick={() => setIsConfirmOpen(false)}
                 className="text-gray-500"
               >
-                Cancel
+               {t("Cancel")}  
               </button>
               <button
                 type="button"
                 onClick={handleConfirmBooking}
                 className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
               >
-                Confirm
+               {t("Confirm")} 
               </button>
             </div>
           </Dialog.Panel>

@@ -6,6 +6,7 @@ import { AiOutlineEdit, AiOutlineDelete, AiOutlinePlus } from 'react-icons/ai';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 const url = import.meta.env.VITE_SERVER_URL;
+import { useTranslation } from 'react-i18next';
 
 interface Room {
     _id?: string;
@@ -36,8 +37,8 @@ const defaultValues = {
     pictures: [],
 };
 
-//amenities array
-const AmenityChoices = ["Room 72m²", "Double Beds", "Free Beach", "Fridge/Bar", "Microwave", "Smart TV", "Sauna", "Room Service",
+const AmenityChoices = [
+    "Room 72m²", "Double Beds", "Free Beach", "Fridge/Bar", "Microwave", "Smart TV", "Sauna", "Room Service",
     "AC", "Booking", "Concrete Flooring", "Storage", "Outdoor Kitchen", "Towels", "Tennis Courts", "Trees & Landscaping",
     "Balcony", "Cable TV", "Family Room", "Shower", "Breakfast", "Ironing", "Soundproof", "Dryer",
 ];
@@ -54,6 +55,7 @@ const RoomManager: React.FC = () => {
     const [existingFrontImage, setExistingFrontImage] = useState<string | null>(null);
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
     const [controller, setController] = useState<AbortController | null>(null);
+    const { t } = useTranslation();
 
     const { register, handleSubmit, reset } = useForm<Room>({ defaultValues });
 
@@ -67,21 +69,22 @@ const RoomManager: React.FC = () => {
         } catch (error: any) {
             const msg = error?.response?.data?.message;
             if (error.response?.status === 404 && msg) {
-                toast.error(msg);
+                toast.error(t(msg));
             } else {
-                toast.error("An error occurred during fetching rooms.");
+                toast.error(t("An error occurred during fetching rooms."));
             }
         } finally {
             setRoomsLoading(false);
         }
     };
+
     const extractKeyFromUrl = (url: string): string => {
         try {
             const parts = url.split('/');
             const keyWithParams = parts[parts.length - 1];
-            return keyWithParams.split('?')[0]; // Remove any query string
+            return keyWithParams.split('?')[0];
         } catch {
-            return url; // fallback if malformed
+            return url;
         }
     };
 
@@ -91,18 +94,17 @@ const RoomManager: React.FC = () => {
         setLoading(true);
         try {
             if (!frontImage && !existingFrontImage) {
-                toast.error("Front view image is required.");
+                toast.error(t("Front view image is required."));
                 setLoading(false);
                 return;
             }
 
             if (roomImages.length === 0 && existingPictures.length === 0) {
-                toast.error("At least one slideshow image is required.");
+                toast.error(t("At least one slideshow image is required."));
                 setLoading(false);
                 return;
             }
 
-            //Convert signed URLs to S3 keys before sending
             const pictureKeys = existingPictures.map(extractKeyFromUrl);
             const frontImageKey = existingFrontImage ? extractKeyFromUrl(existingFrontImage) : null;
 
@@ -131,10 +133,10 @@ const RoomManager: React.FC = () => {
 
             if (editingRoom?._id) {
                 const response = await axios.put(`${url}/api/admin/room/${editingRoom._id}`, formData, config);
-                if (response.status === 200) toast.success('Room updated successfully');
+                if (response.status === 200) toast.success(t('Room updated successfully'));
             } else {
                 const response = await axios.post(`${url}/api/admin/create-room`, formData, config);
-                if (response.status === 201) toast.success('Room created successfully');
+                if (response.status === 201) toast.success(t('Room created successfully'));
             }
 
             fetchRooms();
@@ -149,9 +151,9 @@ const RoomManager: React.FC = () => {
 
         } catch (error: any) {
             if (axios.isCancel(error)) {
-                toast.info('Room creation was cancelled.');
+                toast.info(t('Room creation was cancelled.'));
             } else {
-                toast.error(error?.response?.data?.message || 'Operation failed');
+                toast.error(t(error?.response?.data?.message || 'Operation failed'));
             }
         } finally {
             setLoading(false);
@@ -159,28 +161,24 @@ const RoomManager: React.FC = () => {
         }
     };
 
-
-
     const handleEdit = (room: Room) => {
         setEditingRoom(room);
         reset(room);
-        setExistingFrontImage(room.frontViewPicture); // key, not URL
-        setExistingPictures(room.pictures);           // keys, not URLs
+        setExistingFrontImage(room.frontViewPicture);
+        setExistingPictures(room.pictures);
         setSelectedAmenities(room.amenities);
         setShowModal(true);
     };
-
 
     const handleDelete = async (id: string) => {
         try {
             const response = await axios.delete(`${url}/api/admin/room/${id}`);
             if (response.status === 200) {
                 fetchRooms();
-
-                toast.success('Room deleted successfully');
+                toast.success(t('Room deleted successfully'));
             }
         } catch (error) {
-            toast.error('Failed to delete room');
+            toast.error(t('Failed to delete room'));
         }
     };
 
@@ -189,7 +187,6 @@ const RoomManager: React.FC = () => {
             controller.abort();
             return;
         }
-
         reset(defaultValues);
         setFrontImage(null);
         setRoomImages([]);
@@ -214,13 +211,13 @@ const RoomManager: React.FC = () => {
 
     return (
         <div className="p-4 sm:p-6 text-white mt-32">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-4">Room Management</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-4">{t("Room Management")}</h1>
             <button className="btn btn-primary flex items-center gap-2 mb-4" onClick={() => {
                 setEditingRoom(null);
                 reset(defaultValues);
                 setShowModal(true);
             }}>
-                <AiOutlinePlus /> Add Room
+                <AiOutlinePlus /> {t("Add Room")}
             </button>
 
             {loadingRooms ? (
@@ -228,18 +225,18 @@ const RoomManager: React.FC = () => {
                     <span className="loading loading-spinner loading-lg text-primary"></span>
                 </div>
             ) : rooms.length === 0 ? (
-                <div className="text-center text-gray-400 py-10 text-lg">No rooms available.</div>
+                <div className="text-center text-gray-400 py-10 text-lg">{t("No rooms available.")}</div>
             ) : (
                 <div className="overflow-x-auto rounded-xl border border-base-300 shadow-sm bg-white text-black">
                     <table className="table w-full text-sm sm:text-base">
                         <thead className="bg-base-200">
                             <tr>
-                                <th className="text-left px-4 py-2">Title</th>
-                                <th className="text-left px-4 py-2">Room #</th>
-                                <th className="text-left px-4 py-2">Price</th>
-                                <th className="text-left px-4 py-2">Max People</th>
-                                <th className="text-left px-4 py-2">Status</th>
-                                <th className="text-center px-4 py-2">Actions</th>
+                                <th className="text-left px-4 py-2">{t("Title")}</th>
+                                <th className="text-left px-4 py-2">{t("Room #")}</th>
+                                <th className="text-left px-4 py-2">{t("Price")}</th>
+                                <th className="text-left px-4 py-2">{t("Max People")}</th>
+                                <th className="text-left px-4 py-2">{t("Status")}</th>
+                                <th className="text-center px-4 py-2">{t("Actions")}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -250,12 +247,12 @@ const RoomManager: React.FC = () => {
                                     <td className="px-4 py-2">${room.price}</td>
                                     <td className="px-4 py-2">{room.maxPeople}</td>
                                     <td className="px-4 py-2">
-                                        <span className={`${room.status === 'available' ? 'text-green-600' : room.status === 'booked' ? 'text-orange-400' : 'text-red-600'}`}>{room.status}</span>
+                                        <span className={`${room.status === 'available' ? 'text-green-600' : room.status === 'booked' ? 'text-orange-400' : 'text-red-600'}`}>{t(room.status)}</span>
                                     </td>
                                     <td className="px-4 py-2 text-center">
                                         <div className="flex justify-center gap-2">
                                             <button className="btn btn-sm btn-outline" onClick={() => handleEdit(room)}><AiOutlineEdit /></button>
-                                            <button disabled={loading} className="btn btn-sm btn-error text-white" onClick={() => handleDelete(room._id!)}>{!loading ? <AiOutlineDelete /> : "deleting.."}</button>
+                                            <button disabled={loading} className="btn btn-sm btn-error text-white" onClick={() => handleDelete(room._id!)}>{!loading ? <AiOutlineDelete /> : t("deleting..")}</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -269,25 +266,24 @@ const RoomManager: React.FC = () => {
                 <AnimatePresence>
                     <motion.div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                         <motion.div className="bg-white rounded-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto p-6 shadow-xl" initial={{ scale: 0.9, y: 40 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0 }}>
-                            <h2 className="text-xl font-semibold mb-4 text-center text-black">{editingRoom ? 'Edit Room' : 'Add Room'}</h2>
+                            <h2 className="text-xl font-semibold mb-4 text-center text-black">{editingRoom ? t('Edit Room') : t('Add Room')}</h2>
                             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-black">
-                                {/* Image previews */}
                                 {existingFrontImage && (
                                     <div className="mb-2">
-                                        <p className="font-medium">Existing Front View:</p>
+                                        <p className="font-medium">{t("Existing Front View:")}</p>
                                         <div className="flex gap-2 items-center">
-                                            <img src={existingFrontImage} alt="Front" className="w-24 h-16 object-cover rounded" />
-                                            <button type="button" className="btn btn-xs btn-error" onClick={handleRemoveFrontImage}>Remove</button>
+                                            <img src={existingFrontImage} alt={t("Front")} className="w-24 h-16 object-cover rounded" />
+                                            <button type="button" className="btn btn-xs btn-error" onClick={handleRemoveFrontImage}>{t("Remove")}</button>
                                         </div>
                                     </div>
                                 )}
                                 {existingPictures.length > 0 && (
                                     <div className="mb-2">
-                                        <p className="font-medium">Existing Slide Show Images:</p>
+                                        <p className="font-medium">{t("Existing Slide Show Images:")}</p>
                                         <div className="flex flex-wrap gap-2">
                                             {existingPictures.map((img, idx) => (
                                                 <div key={idx} className="relative">
-                                                    <img src={img} alt="room" className="w-24 h-16 object-cover rounded" />
+                                                    <img src={img} alt={t("room")} className="w-24 h-16 object-cover rounded" />
                                                     <button type="button" className="btn btn-xs btn-error absolute top-0 right-0" onClick={() => handleRemoveExistingImage(img)}>x</button>
                                                 </div>
                                             ))}
@@ -296,28 +292,27 @@ const RoomManager: React.FC = () => {
                                 )}
                                 <fieldset disabled={loading} className="space-y-4">
                                     <div>
-                                        <label className="label">Title</label>
+                                        <label className="label">{t("Title")}</label>
                                         <input className="input input-bordered w-full" {...register('title')} />
                                     </div>
                                     <div>
-                                        <label className="label">Room Number</label>
+                                        <label className="label">{t("Room Number")}</label>
                                         <input className="input input-bordered w-full" {...register('roomNumber')} />
                                     </div>
                                     <div>
-                                        <label className="label">Description</label>
+                                        <label className="label">{t("Description")}</label>
                                         <textarea className="textarea textarea-bordered w-full" {...register('description')} />
                                     </div>
                                     <div>
-                                        <label className="label">Price</label>
+                                        <label className="label">{t("Price")}</label>
                                         <input type="number" className="input input-bordered w-full" {...register('price')} />
                                     </div>
                                     <div>
-                                        <label className="label">Max People</label>
+                                        <label className="label">{t("Max People")}</label>
                                         <input type="number" className="input input-bordered w-full" {...register('maxPeople')} />
                                     </div>
-                                    {/* Front View Image */}
                                     <div>
-                                        <label className="label">Front View Picture</label>
+                                        <label className="label">{t("Front View Picture")}</label>
                                         <input
                                             type="file"
                                             accept="image/*"
@@ -325,10 +320,8 @@ const RoomManager: React.FC = () => {
                                             onChange={(e) => setFrontImage(e.target.files?.[0] || null)}
                                         />
                                     </div>
-
-                                    {/* Multiple Pictures */}
                                     <div>
-                                        <label className="label">Room Pictures (Slide Show)</label>
+                                        <label className="label">{t("Room Pictures (Slide Show)")}</label>
                                         <input
                                             type="file"
                                             accept="image/*"
@@ -337,10 +330,8 @@ const RoomManager: React.FC = () => {
                                             onChange={(e) => setRoomImages(Array.from(e.target.files || []))}
                                         />
                                     </div>
-
-                                    {/* Amenities Checkboxes */}
                                     <div>
-                                        <label className="label">Amenities</label>
+                                        <label className="label">{t("Amenities")}</label>
                                         <div className="grid grid-cols-2 gap-2">
                                             {AmenityChoices.map((item) => (
                                                 <label key={item} className="flex gap-2 items-center">
@@ -355,50 +346,47 @@ const RoomManager: React.FC = () => {
                                                             );
                                                         }}
                                                     />
-                                                    {item}
+                                                    {t(item)}
                                                 </label>
                                             ))}
                                         </div>
                                     </div>
-
                                     <div>
-                                        <label className="label">Number of Beds</label>
+                                        <label className="label">{t("Number of Beds")}</label>
                                         <input type="number" className="input input-bordered w-full" {...register('numberOfBeds')} />
                                     </div>
                                     <div>
-                                        <label className="label">Room Type</label>
+                                        <label className="label">{t("Room Type")}</label>
                                         <select className="select select-bordered w-full" {...register('roomType')}>
-                                            <option value="Classic">Classic</option>
-                                            <option value="Deluxe">Deluxe</option>
-                                            <option value="Suite">Suite</option>
-                                            <option value="Single">Single</option>
-                                            <option value="Double">Double</option>
+                                            <option value="Classic">{t("Classic")}</option>
+                                            <option value="Deluxe">{t("Deluxe")}</option>
+                                            <option value="Suite">{t("Suite")}</option>
+                                            <option value="Single">{t("Single")}</option>
+                                            <option value="Double">{t("Double")}</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="label">Status</label>
+                                        <label className="label">{t("Status")}</label>
                                         <select className="select select-bordered w-full" {...register('status')}>
-                                            <option value="available">Available</option>
-                                            <option value="booked">Booked</option>
-                                            <option value="maintenance">Maintenance</option>
+                                            <option value="available">{t("Available")}</option>
+                                            <option value="booked">{t("Booked")}</option>
+                                            <option value="maintenance">{t("Maintenance")}</option>
                                         </select>
                                     </div>
                                 </fieldset>
-
                                 <div className="flex gap-4 justify-end mt-4">
                                     <button type="submit" className="btn btn-primary" disabled={loading}>
                                         {loading ? (
                                             <span className="loading loading-spinner loading-sm"></span>
-                                        ) : editingRoom ? 'Update' : 'Create'}
+                                        ) : editingRoom ? t('Update') : t('Create')}
                                     </button>
-
                                     <button
                                         type="button"
                                         disabled={loading}
                                         className="btn btn-outline"
                                         onClick={handleCancel}
                                     >
-                                        Cancel
+                                        {t("Cancel")}
                                     </button>
                                 </div>
                             </form>

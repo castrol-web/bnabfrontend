@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import { FiShoppingCart } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function EmptyCart() {
     const navigate = useNavigate();
+    const { t } = useTranslation()
 
     return (
         <div className="flex items-center justify-center min-h-[70vh] px-4">
@@ -16,16 +18,16 @@ function EmptyCart() {
                 <div className="flex flex-col items-center space-y-4">
                     <FiShoppingCart className="text-5xl text-gray-400" />
                     <h2 className="text-xl font-semibold text-gray-700">
-                        Your cart is empty
+                        {t("Your cart is empty")}
                     </h2>
                     <p className="text-sm text-gray-500">
-                        Looks like you haven’t added any rooms yet.
+                        {t("Looks like you haven't added any rooms yet.")}
                     </p>
                     <button
                         className="btn btn-primary mt-2"
                         onClick={() => navigate("/our-rooms")}
                     >
-                        Browse Rooms
+                        {t("Browse Rooms")}
                     </button>
                 </div>
             </motion.div>

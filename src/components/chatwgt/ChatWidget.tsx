@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiX } from "react-icons/fi";
 const url = import.meta.env.VITE_CHATBOT_URL;
 const WHATSAPP_NUMBER = "+254113368527";
+import { useTranslation } from "react-i18next";
 
 interface Message {
     sender: "user" | "bot";
@@ -12,6 +13,7 @@ interface Message {
 }
 
 const ChatWidget = () => {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
         { sender: "bot", text: "Hello! How can we help you today?" },
@@ -100,7 +102,7 @@ const ChatWidget = () => {
                                         <span className="text-sm">BNB</span>
                                     </div>
                                 </div>
-                                <h4 className="font-bold text-primary">Chat with us</h4>
+                                <h4 className="font-bold text-primary">{t("Chat with us")}</h4>
                             </div>
 
                             {/* Right: Close Button */}
@@ -127,13 +129,13 @@ const ChatWidget = () => {
                                             : "chat-bubble-info"
                                             }`}
                                     >
-                                        {msg.text}
+                                        {t(msg.text)}
                                     </div>
                                 </div>
                             ))}
                             {loading && (
                                 <div className="chat chat-start">
-                                    <div className="chat-bubble chat-bubble-info">Thinking...</div>
+                                    <div className="chat-bubble chat-bubble-info">{t("Thinking...")}</div>
                                 </div>
                             )}
                             <div ref={messagesEndRef} />
@@ -149,7 +151,7 @@ const ChatWidget = () => {
                                     className="btn btn-success btn-block gap-2"
                                 >
                                     <FaWhatsapp size={20} />
-                                    Talk to an Agent on WhatsApp
+                                    {t("Talk to an Agent on WhatsApp")}
                                 </a>
                             </div>
                         )}
