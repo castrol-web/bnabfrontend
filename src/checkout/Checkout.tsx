@@ -1,5 +1,3 @@
-// Optimized version of the Checkout component UI with improved TailwindCSS, DaisyUI, and Framer Motion
-
 import axios from "axios";
 import { useCart } from "../context/CartContext";
 import { useState, useEffect } from "react";
@@ -13,25 +11,16 @@ import { toast, ToastContainer } from "react-toastify";
 import { motion } from "framer-motion";
 import { useAuth } from "../hooks/UseAuth";
 import EmptyCart from "../context/EmptyCart";
-const url = import.meta.env.VITE_SERVER_URL;
 import { useTranslation } from "react-i18next";
-
-interface Room {
-  _id: string;
-  title: string;
-  price: number;
-  specialRequests?: string;
-  maxPeople: number;
-  roomType: string;
-}
+const url = import.meta.env.VITE_SERVER_URL;
 
 interface LocationState {
   directBooking?: boolean;
-  room?: Room;
+  room?: any;
 }
 
 function Checkout() {
-  const { cart, removeFromCart, clearCart } = useCart();
+  const { cart, clearCart } = useCart();
   const [specialRequests, setSpecialRequest] = useState<string>("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [guestCounts, setGuestCounts] = useState<Record<string, number>>({});
@@ -39,11 +28,15 @@ function Checkout() {
   const [calendarOpen, setCalendarOpen] = useState<Record<string, boolean>>({});
   const [validationError, setValidationError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const location = useLocation();
   const state = location.state as LocationState;
   const directBooking = state?.directBooking;
   const roomFromDirect = state?.room;
-  const roomsToBook: Room[] = directBooking ? [roomFromDirect!] : cart;
+
+  // Compose rooms to book, either direct single booking or full cart
+  const roomsToBook = directBooking && roomFromDirect ? [roomFromDirect] : cart;
+
   const { isAuthenticated, LoadingUser, user } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -56,15 +49,16 @@ function Checkout() {
     const newCalendarToggles: Record<string, boolean> = {};
 
     roomsToBook.forEach((room) => {
-      newGuests[room._id] = 1;
-      newRanges[room._id] = [
+      const roomKey = `${room._id}-${room.selectedConfiguration.roomType}`;
+      newGuests[roomKey] = 1;
+      newRanges[roomKey] = [
         {
           startDate: new Date(),
           endDate: new Date(Date.now() + 86400000),
           key: "selection",
         },
       ];
-      newCalendarToggles[room._id] = false;
+      newCalendarToggles[roomKey] = false;
     });
 
     setGuestCounts(newGuests);
@@ -78,73 +72,94 @@ function Checkout() {
     }
   }, [isAuthenticated, LoadingUser, navigate, location]);
 
-  const handleGuestChange = (roomId: string, value: string, maxPeople: number) => {
+  const handleGuestChange = (roomKey: string, value: string, maxPeople: number) => {
     const num = parseInt(value);
     if (isNaN(num) || num < 1 || num > maxPeople) return;
-    setGuestCounts((prev) => ({ ...prev, [roomId]: num }));
+    setGuestCounts((prev) => ({ ...prev, [roomKey]: num }));
   };
 
-  const handleDateChange = (roomId: string, ranges: RangeKeyDict) => {
+  const handleDateChange = (roomKey: string, ranges: RangeKeyDict) => {
     setDateRanges((prev) => ({
       ...prev,
-      [roomId]: [ranges.selection],
+      [roomKey]: [ranges.selection],
     }));
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSpecialRequest(e.target.value);
   };
 
   const handleConfirmBooking = async () => {
     setIsConfirmOpen(false);
+
+    // Validate inputs
     for (let room of roomsToBook) {
-      const guests = guestCounts[room._id] || 1;
-      const range = dateRanges[room._id]?.[0];
+      const roomKey = `${room._id}-${room.selectedConfiguration.roomType}`;
+      const guests = guestCounts[roomKey] || 1;
+      const range = dateRanges[roomKey]?.[0];
       if (!range?.startDate || !range?.endDate || !isBefore(range.startDate, range.endDate)) {
-        setValidationError(`Invalid dates selected for ${room.title}`);
+        setValidationError(`Invalid dates selected for ${room.title} (${room.selectedConfiguration.roomType})`);
         return;
       }
-      if (guests > room.maxPeople) {
-        setValidationError(`"${room.title}" allows up to ${room.maxPeople} guests.`);
+      if (guests > room.selectedConfiguration.maxPeople) {
+        setValidationError(`"${room.title}" (${room.selectedConfiguration.roomType}) allows up to ${room.selectedConfiguration.maxPeople} guests.`);
         return;
       }
     }
 
     const bookingPayload = roomsToBook.map((room) => {
-      const range = dateRanges[room._id][0];
+      const roomKey = `${room._id}-${room.selectedConfiguration.roomType}`;
+      const range = dateRanges[roomKey][0];
       const nights = differenceInDays(range.endDate!, range.startDate!);
-      const subtotal = nights * room.price * (guestCounts[room._id] || 1);
+      const guests = guestCounts[roomKey] || 1;
+      const subtotal = nights * room.selectedConfiguration.price * guests;
       return {
         room: room._id,
-        guests: guestCounts[room._id] || 1,
+        roomType: room.selectedConfiguration.roomType,
+        bedType: room.selectedConfiguration.bedType,
+        guests,
         checkInDate: range.startDate,
         checkOutDate: range.endDate,
-        pricePerNight: room.price,
+        pricePerNight: room.selectedConfiguration.price,
         totalNights: nights,
         subtotal,
       };
     });
 
     const totalAmount = bookingPayload.reduce((sum, item) => sum + item.subtotal, 0);
+
     setLoading(true);
     try {
-      const response = await axios.post(`${url}/api/user/bookings`, { rooms: bookingPayload, totalAmount, specialRequests }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': user?.token || '',
-        },
-      });
-      if (response.status === 201) {
-        toast.success(response.data.message);
-        if (directBooking) {
-          setTimeout(() => navigate("/"), 2000);
-        } else {
-          clearCart();
+      const response = await axios.post(
+        `${url}/api/user/bookings`,
+        { rooms: bookingPayload, totalAmount, specialRequests },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
         }
+      );
+      if (response.status === 201) {
+        toast.success(response.data.message || "Room booked successfully");
+        setTimeout(() => {
+          if (directBooking) {
+            navigate("/");
+          } else {
+            clearCart();
+            navigate("/");
+          }
+        }, 5000);
       }
-    } catch (err: any) {
-      console.error(err.response?.data?.message || err.message);
-      toast.error("Booking failed. Try again.");
+    } catch (error: any) {
+      const msg = error?.response?.data?.message;
+      if (error.response?.status === 404 && msg) {
+        toast.error(msg)
+        navigate("/login", { state: { from: location } })
+      } else if (error.response?.status === 401 && msg) {
+        toast.error(msg)
+        navigate("/login", { state: { from: location } })
+      } else if (error.response?.status === 500) {
+        toast.error(msg);
+      } else {
+        toast.error(t("Booking failed.Please try again!"));
+      }
     } finally {
       setLoading(false);
     }
@@ -159,20 +174,23 @@ function Checkout() {
       </h1>
 
       <div className="grid gap-6">
-        {roomsToBook.map((item) => {
-          const range = dateRanges[item._id]?.[0];
+        {roomsToBook.map((room) => {
+          const roomKey = `${room._id}-${room.selectedConfiguration.roomType}`;
+          const range = dateRanges[roomKey]?.[0];
           return (
             <motion.div
-              key={item._id}
+              key={roomKey}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
               className="rounded-xl border border-base-300 p-6 shadow-sm bg-base-500"
             >
-              <h2 className="text-xl font-semibold text-primary mb-1">{t(item.title)}</h2>
-              <p className="text-sm text-gray-400">{t(item.roomType)} • {t("Max people")}: {item.maxPeople}</p>
+              <h2 className="text-xl font-semibold text-primary mb-1">{t(room.title)}</h2>
+              <p className="text-sm text-gray-400">
+                {t(room.selectedConfiguration.roomType)} • {t("Max people")}: {room.selectedConfiguration.maxPeople}
+              </p>
 
-              <div className="mt-4 sm:flex-row sm:items-center gap-4">
+              <div className="mt-4 sm:flex-row sm:items-center gap-4 flex flex-wrap items-center">
                 <div>
                   <label className="label">
                     <span className="label-text">{t("Number of Guests")}</span>
@@ -180,22 +198,23 @@ function Checkout() {
                   <input
                     type="number"
                     min={1}
-                    max={item.maxPeople}
-                    value={guestCounts[item._id] || 1}
-                    onChange={(e) => handleGuestChange(item._id, e.target.value, item.maxPeople)}
+                    max={room.selectedConfiguration.maxPeople}
+                    value={guestCounts[roomKey] || 1}
+                    onChange={(e) => handleGuestChange(roomKey, e.target.value, room.selectedConfiguration.maxPeople)}
                     className="input input-bordered w-24 text-gray-800"
                   />
                 </div>
-                <div className="flex-1">
+
+                <div className="flex-1 ml-4">
                   <label className="label">
                     <span className="label-text">{t("Special Requests")}</span>
                   </label>
                   <input
                     type="text"
                     name="specialRequests"
-                    placeholder="Enter special request if any"
+                    placeholder={t("Enter special request if any")}
                     className="input input-bordered w-full text-gray-800"
-                    onChange={handleChange}
+                    onChange={(e) => setSpecialRequest(e.target.value)}
                     value={specialRequests}
                   />
                 </div>
@@ -207,21 +226,23 @@ function Checkout() {
                 </label>
                 <button
                   type="button"
-                  onClick={() => setCalendarOpen((prev) => ({ ...prev, [item._id]: !prev[item._id] }))}
+                  onClick={() =>
+                    setCalendarOpen((prev) => ({ ...prev, [roomKey]: !prev[roomKey] }))
+                  }
                   className="btn btn-outline w-full text-left"
                 >
                   {range?.startDate && range?.endDate
                     ? `${format(range.startDate, "MMM dd")} - ${format(range.endDate, "MMM dd, yyyy")}`
-                    : "Select dates"}
+                    : t("Select dates")}
                 </button>
 
-                {calendarOpen[item._id] && (
+                {calendarOpen[roomKey] && (
                   <div className="relative z-30 mt-2">
                     <DateRange
                       editableDateInputs
-                      onChange={(ranges) => handleDateChange(item._id, ranges)}
+                      onChange={(ranges) => handleDateChange(roomKey, ranges)}
                       moveRangeOnFirstSelection={false}
-                      ranges={dateRanges[item._id]}
+                      ranges={dateRanges[roomKey]}
                       minDate={new Date()}
                     />
                   </div>
@@ -229,12 +250,7 @@ function Checkout() {
               </div>
 
               <div className="mt-6 flex justify-between">
-                <span className="text-lg font-medium text-primary">${item.price} {t("/night")}</span>
-                {!directBooking && (
-                  <button onClick={() => removeFromCart(item._id)} className="btn btn-sm btn-error">
-                    {t("Remove")}
-                  </button>
-                )}
+                <span className="text-lg font-medium text-primary">${room.selectedConfiguration.price} {t("/night")}</span>
               </div>
             </motion.div>
           );
@@ -245,14 +261,15 @@ function Checkout() {
         <h2 className="text-xl font-semibold mb-4">{t("Summary")}</h2>
         <ul className="text-sm space-y-2">
           {roomsToBook.map((room) => {
-            const range = dateRanges[room._id]?.[0];
+            const roomKey = `${room._id}-${room.selectedConfiguration.roomType}`;
+            const range = dateRanges[roomKey]?.[0];
             if (!range?.startDate || !range?.endDate) return null;
             const nights = differenceInDays(range.endDate, range.startDate);
-            const subtotal = nights * room.price;
+            const subtotal = nights * room.selectedConfiguration.price;
             return (
-              <li key={room._id}>
-                <span className="font-medium">{room.title}</span> — {nights} night(s) × ${room.price} =
-                <span className="font-semibold"> ${subtotal.toFixed(2)}</span>
+              <li key={roomKey}>
+                <span className="font-medium">{room.title}</span> ({room.selectedConfiguration.roomType}) — {nights} night(s) × ${room.selectedConfiguration.price} =
+                <span className="font-semibold"> ${(subtotal).toFixed(2)}</span>
               </li>
             );
           })}
@@ -260,10 +277,11 @@ function Checkout() {
         <div className="text-right text-lg font-bold mt-4">
           Total: $
           {roomsToBook.reduce((sum, room) => {
-            const range = dateRanges[room._id]?.[0];
+            const roomKey = `${room._id}-${room.selectedConfiguration.roomType}`;
+            const range = dateRanges[roomKey]?.[0];
             if (!range?.startDate || !range?.endDate) return sum;
             const nights = differenceInDays(range.endDate, range.startDate);
-            return sum + nights * room.price;
+            return sum + nights * room.selectedConfiguration.price;
           }, 0).toFixed(2)}
         </div>
         {validationError && (
@@ -278,12 +296,13 @@ function Checkout() {
           disabled={loading}
           onClick={() => {
             const invalid = roomsToBook.some((room) => {
-              const range = dateRanges[room._id]?.[0];
+              const roomKey = `${room._id}-${room.selectedConfiguration.roomType}`;
+              const range = dateRanges[roomKey]?.[0];
               return !range?.startDate || !range?.endDate || !isBefore(range.startDate, range.endDate);
             });
 
             if (invalid) {
-              setValidationError("Please make sure all rooms have valid check-in and check-out dates.");
+              setValidationError(t("Please make sure all rooms have valid check-in and check-out dates."));
               return;
             }
 
@@ -292,29 +311,41 @@ function Checkout() {
           }}
           className="btn btn-success"
         >
-          {loading ? "Processing..." : "Proceed to Booking"}
+          {loading ? t("Processing...") : t("Proceed to Booking")}
         </motion.button>
       </div>
 
-      <Dialog open={isConfirmOpen} onClose={() => setIsConfirmOpen(false)} className="fixed inset-0 z-50">
-        <div className="fixed inset-0 bg-black/40" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="bg-base-100 max-w-md w-full p-6 rounded shadow-xl">
-            <Dialog.Title className="text-xl font-bold mb-4">{t("Confirm Booking")}</Dialog.Title>
-            <p className="mb-6">{t("Are you sure you want to confirm your booking?")}</p>
-            <div className="flex justify-end gap-4">
-              <button onClick={() => setIsConfirmOpen(false)} className="btn">
-                {t("Cancel")}
-              </button>
-              <button onClick={handleConfirmBooking} className="btn btn-success">
-                {t("Confirm")}
-              </button>
-            </div>
-          </Dialog.Panel>
+      <Dialog
+        open={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      >
+        <div className="fixed inset-0 bg-black opacity-30" aria-hidden="true" />
+
+        <div className="bg-base-100 rounded-lg p-6 max-w-md mx-auto z-50">
+          <Dialog.Title className="text-xl font-bold mb-4">{t("Confirm Booking")}</Dialog.Title>
+          {validationError && <p className="text-error mb-4">{validationError}</p>}
+          <p className="mb-6">{t("Are you sure you want to confirm your booking?")}</p>
+
+          <div className="flex justify-end gap-4">
+            <button
+              onClick={() => setIsConfirmOpen(false)}
+              className="btn btn-outline"
+            >
+              {t("Cancel")}
+            </button>
+            <button
+              onClick={handleConfirmBooking}
+              className="btn btn-success"
+              disabled={loading}
+            >
+              {loading ? t("Processing...") : t("Confirm")}
+            </button>
+          </div>
         </div>
       </Dialog>
 
-      <ToastContainer />
+      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
 }

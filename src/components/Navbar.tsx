@@ -111,7 +111,7 @@ function Navbar() {
                   {cart.length} {cart.length > 1 ? t("Rooms") : t("Room")}
                 </span>
                 <span className="text-info">
-                  {t("Subtotal")}: ${cart.reduce((acc, item) => acc + item.price, 0)}
+                  {t("Subtotal")}: ${cart.reduce((acc, item) => acc + (item.selectedConfiguration?.price || 0), 0)}
                 </span>
                 <div className="card-actions flex flex-col gap-2">
                   <button

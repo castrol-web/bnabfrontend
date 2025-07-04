@@ -1,54 +1,74 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
-// Define Room type
-type Room = {
-  _id: string,
-  title: string,
-  roomNumber: string,
-  description: string[],
-  amenities: string[],
-  price: number,
-  maxPeople: number,
-  numberOfBeds: number,
-  roomType: string,
-  pictures: string[],
-  frontViewPicture: string,
-  status: string,
-  starRating: number,
-  createdAt?: string;
-};
+interface RoomConfiguration {
+  roomType: string;
+  price: number;
+  numberOfBeds: number;
+  bedType: string;
+  maxPeople: number;
+}
 
+interface Room {
+  _id: string;
+  title: string;
+  roomNumber: string;
+  description: string;
+  amenities: string[];
+  configurations: RoomConfiguration[];
+  pictures: string[];
+  frontViewPicture: string;
+  status: string;
+  starRating: number;
+  createdAt?: string;
+}
+
+interface CartItem extends Room {
+  selectedConfiguration: RoomConfiguration;
+}
 
 type CartContextType = {
-  cart: Room[];
-  addToCart: (room: Room) => void;
-  removeFromCart: (id: string) => void;
+  cart: CartItem[];
+  addToCart: (item: CartItem) => void;
+  removeFromCart: (roomId: string, roomType: string) => void;
   clearCart: () => void;
 };
 
-
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// Provider component
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cart, setCart] = useState<Room[]>(() => {
+  // Initialize cart from localStorage or empty
+  const [cart, setCart] = useState<CartItem[]>(() => {
     const stored = localStorage.getItem("cart");
     return stored ? JSON.parse(stored) : [];
   });
 
+  // Sync cart to localStorage on change
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (room: Room) => {
-    if (!cart.find((item) => item._id === room._id)) {
-      setCart([...cart, room]);
+  // Add item only if combination of _id and selectedConfiguration.roomType does not exist
+  const addToCart = (item: CartItem) => {
+    const exists = cart.some(
+      (cartItem) =>
+        cartItem._id === item._id &&
+        cartItem.selectedConfiguration.roomType === item.selectedConfiguration.roomType
+    );
+    if (!exists) {
+      setCart([...cart, item]);
     }
   };
 
-  const removeFromCart = (id: string) => {
-    setCart(cart.filter((item) => item._id !== id));
+  // Remove by room id and configuration roomType
+  const removeFromCart = (roomId: string, roomType: string) => {
+    setCart(
+      cart.filter(
+        (item) =>
+          !(item._id === roomId && item.selectedConfiguration.roomType === roomType)
+      )
+    );
   };
+
   const clearCart = () => setCart([]);
 
   return (
@@ -58,9 +78,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Custom hook to use the cart context
 export function useCart() {
   const context = useContext(CartContext);
-  if (!context) throw new Error("useCart must be used within a CartProvider");
+  if (!context) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
   return context;
 }

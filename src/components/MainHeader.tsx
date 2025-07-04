@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import waterfal from "../assets/waterfal.jpg";
+import bnb1 from "../assets/bnb1.jpg";
 import bnbpic from "../assets/bnbpic.jpg";
-import park from "../assets/park.jpg";
+import bnb2 from "../assets/bnb2.jpg";
 import { useTranslation } from "react-i18next";
 
 function MainHeader() {
   const [index, setIndex] = useState(0);
   const { t } = useTranslation();
-  const images = [waterfal, bnbpic, park];
+  const images = [bnb1, bnbpic, bnb2];
 
   const content = [
     {

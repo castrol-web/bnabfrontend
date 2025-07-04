@@ -2,22 +2,28 @@ import axios from "axios";
 import { create } from "zustand";
 const url = import.meta.env.VITE_SERVER_URL;
 
-interface RoomsProp {
-    _id: string,
-    title: string,
-    roomNumber: string,
-    description: string[],
-    amenities: string[],
-    price: number,
-    maxPeople: number,
-    numberOfBeds: number,
-    roomType: string,
-    pictures: string,
-    frontViewPicture: string,
-    status: string,
-    starRating: number,
-    createdAt?: string;
+interface RoomConfiguration {
+  roomType: string;
+  price: number;
+  numberOfBeds: number;
+  bedType: string;
+  maxPeople: number;
 }
+
+interface RoomsProp {
+  _id: string;
+  title: string;
+  roomNumber: string;
+  description: string; 
+  amenities: string[];
+  configurations: RoomConfiguration[]; 
+  pictures: string[];
+  frontViewPicture: string;
+  status: 'available' | 'booked' | 'maintenance';
+  starRating: number;
+  createdAt?: string;
+}
+
 
 interface RoomState {
     loading: boolean,

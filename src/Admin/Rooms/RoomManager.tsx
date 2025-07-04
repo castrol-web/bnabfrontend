@@ -8,29 +8,41 @@ import 'react-toastify/dist/ReactToastify.css';
 const url = import.meta.env.VITE_SERVER_URL;
 import { useTranslation } from 'react-i18next';
 
+
+interface RoomConfiguration {
+    roomType: string;
+    price: number;
+    numberOfBeds: number;
+    bedType: string;
+    maxPeople: number;
+}
+
 interface Room {
     _id?: string;
     title: string;
     roomNumber: string;
     description: string;
-    price: number;
-    maxPeople: number;
-    numberOfBeds: number;
-    roomType: string;
+    configurations: RoomConfiguration[];
     status: string;
     amenities: string[];
     frontViewPicture: string;
     pictures: string[];
 }
 
+
 const defaultValues = {
     title: '',
     roomNumber: '',
     description: '',
-    price: 0,
-    maxPeople: 1,
-    numberOfBeds: 1,
-    roomType: 'Single',
+    configurations: [
+        {
+            roomType: '',
+            price: 0,
+            numberOfBeds: 1,
+            bedType: '',
+            maxPeople: 1
+        }
+    ],
     status: 'available',
     amenities: [],
     frontViewPicture: '',
@@ -38,9 +50,9 @@ const defaultValues = {
 };
 
 const AmenityChoices = [
-    "Room 72m²","Room 20m²","Room 26m²","Toothbrush","Shampoo","Slippers","Room 16m²","Room 24m²","Room 28m²", "Double Beds","Single Bed","Tripple", "Free Beach", "Smart TV", "Sauna", "Room Service","Bath tab",
-    "AC", "Booking", "Storage", "Outdoor Kitchen", "Towels", "Tennis Courts", "Trees & Landscaping",
-    "Big Wardrobe", "Cable TV", "Family Room", "Shower", "Breakfast", "Ironing", "Soundproof", "Dryer",
+    "Room 20m²", "Room 26m²", "Toothbrush", "Shampoo", "Slippers", "Room 16m²", "Room 24m²", "Room 28m²", "Double Beds", "Single Bed", "Tripple", "Smart TV", "Sauna", "Room Service", "Bath tab",
+    "AC", "Booking", "Storage", "Outdoor Kitchen", "Towels",
+    "Big Wardrobe", "Cable TV", "Family Room", "Shower", "Breakfast", "Soundproof", "Dryer",
 ];
 
 const RoomManager: React.FC = () => {
@@ -88,6 +100,53 @@ const RoomManager: React.FC = () => {
             return url;
         }
     };
+    useEffect(() => {
+        if (editingRoom) {
+            setConfigurations(editingRoom.configurations || defaultValues.configurations);
+            reset(editingRoom);
+            setExistingFrontImage(editingRoom.frontViewPicture || null);
+            setExistingPictures(editingRoom.pictures || []);
+            setSelectedAmenities(editingRoom.amenities || []);
+        } else {
+            setConfigurations(defaultValues.configurations);
+            reset(defaultValues);
+            setExistingFrontImage(null);
+            setExistingPictures([]);
+            setSelectedAmenities([]);
+        }
+    }, [editingRoom, reset]);
+
+
+    //configurations
+    const [configurations, setConfigurations] = useState<RoomConfiguration[]>([
+        { roomType: 'Single', price: 0, numberOfBeds: 1, bedType: '', maxPeople: 1 }
+    ]);
+
+    const updateConfigField = <K extends keyof RoomConfiguration>(
+        index: number,
+        field: K,
+        value: RoomConfiguration[K]
+    ) => {
+        const updated = [...configurations];
+        updated[index][field] = value;
+        setConfigurations(updated);
+    };
+
+
+    const addConfig = () => {
+        setConfigurations([...configurations, {
+            roomType: '',
+            price: 0,
+            numberOfBeds: 1,
+            bedType: '',
+            maxPeople: 1
+        }]);
+    };
+
+    const removeConfig = (index: number) => {
+        setConfigurations((prev) => prev.filter((_, idx) => idx !== index));
+    };
+
 
     const onSubmit = async (data: any) => {
         const abortController = new AbortController();
@@ -113,10 +172,7 @@ const RoomManager: React.FC = () => {
             formData.append('title', data.title);
             formData.append('roomNumber', data.roomNumber);
             formData.append('description', data.description);
-            formData.append('price', data.price.toString());
-            formData.append('maxPeople', data.maxPeople.toString());
-            formData.append('numberOfBeds', data.numberOfBeds.toString());
-            formData.append('roomType', data.roomType);
+            formData.append('configurations', JSON.stringify(configurations));
             formData.append('status', data.status);
             formData.append('amenities', JSON.stringify(selectedAmenities));
             formData.append('imagesToKeep', JSON.stringify(pictureKeys));
@@ -142,6 +198,7 @@ const RoomManager: React.FC = () => {
 
             fetchRooms();
             reset(defaultValues);
+            setConfigurations(defaultValues.configurations);
             setFrontImage(null);
             setRoomImages([]);
             setExistingPictures([]);
@@ -164,12 +221,9 @@ const RoomManager: React.FC = () => {
 
     const handleEdit = (room: Room) => {
         setEditingRoom(room);
-        reset(room);
-        setExistingFrontImage(room.frontViewPicture);
-        setExistingPictures(room.pictures);
-        setSelectedAmenities(room.amenities);
         setShowModal(true);
     };
+
 
     const handleDelete = async (id: string) => {
         try {
@@ -215,7 +269,6 @@ const RoomManager: React.FC = () => {
             <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-slate-300">{t("Room Management")}</h1>
             <button className="btn btn-primary flex items-center gap-2 mb-4" onClick={() => {
                 setEditingRoom(null);
-                reset(defaultValues);
                 setShowModal(true);
             }}>
                 <AiOutlinePlus /> {t("Add Room")}
@@ -249,8 +302,13 @@ const RoomManager: React.FC = () => {
                                 >
                                     <td className="px-4 py-3">{room.title}</td>
                                     <td className="px-4 py-3">{room.roomNumber}</td>
-                                    <td className="px-4 py-3">${room.price}</td>
-                                    <td className="px-4 py-3">{room.maxPeople}</td>
+                                    <td className="px-4 py-3">
+                                        {room.configurations?.[0]?.price ? `$${room.configurations[0].price}` : 'N/A'}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        {room.configurations?.[0]?.maxPeople ?? 'N/A'}
+                                    </td>
+
                                     <td className="px-4 py-3">
                                         <span
                                             className={`font-medium ${room.status === "available"
@@ -331,13 +389,63 @@ const RoomManager: React.FC = () => {
                                         <textarea className="textarea textarea-bordered w-full" {...register('description')} />
                                     </div>
                                     <div>
-                                        <label className="label">{t("Price")}</label>
-                                        <input type="number" className="input input-bordered w-full" {...register('price')} />
+                                        <label className="label">{t("Room Configurations")}</label>
+                                        {configurations.map((config, idx) => (
+                                            <div key={idx} className="border p-2 mb-2 rounded">
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div>
+                                                        <select className="select select-bordered w-full" value={config.roomType}
+                                                            onChange={(e) => updateConfigField(idx, 'roomType', e.target.value)}>
+                                                            <option value="">{t("Choose room type")}</option>
+                                                            <option value="Tripple">{t("Tripple")}</option>
+                                                            <option value="Small Double">{t("Small Double")}</option>
+                                                            <option value="Single">{t("Single")}</option>
+                                                            <option value="Double">{t("Family")}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="label">{t("Price for the room type")}</label>
+                                                        <input type="number" placeholder="Price" className="input input-bordered w-full"
+                                                            value={config.price}
+                                                            onChange={(e) => updateConfigField(idx, 'price', +e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="label">{t("Number of beds of room type")}</label>
+                                                        <input type="number" placeholder="Number of Beds" className="input input-bordered w-full"
+                                                            value={config.numberOfBeds}
+                                                            onChange={(e) => updateConfigField(idx, 'numberOfBeds', +e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="label">{t("Bed type")}</label>
+                                                        <select className="select select-bordered w-full" value={config.bedType}
+                                                            onChange={(e) => updateConfigField(idx, 'bedType', e.target.value)}>
+                                                            <option value="">{t("Choose bed type")}</option>
+                                                            <option value="Single">{t("Single")}</option>
+                                                            <option value="Queen">{t("Queen")}</option>
+                                                            <option value="Double">{t("Double")}</option>
+                                                            <option value="King">{t("King")}</option>
+                                                            <option value="Bunk">{t("Bunk")}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="label">{t("Maximum people")}</label>
+                                                        <input type="number" placeholder="Max People" className="input input-bordered w-full"
+                                                            value={config.maxPeople}
+                                                            onChange={(e) => updateConfigField(idx, 'maxPeople', +e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <button type="button" className="btn btn-sm btn-error mt-2" onClick={() => removeConfig(idx)}>{t("Remove")}</button>
+                                            </div>
+                                        ))}
+                                        <button type="button" className="btn btn-sm btn-outline mt-2" onClick={addConfig}>
+                                            <AiOutlinePlus /> {t("Add Configuration")}
+                                        </button>
                                     </div>
-                                    <div>
-                                        <label className="label">{t("Max People")}</label>
-                                        <input type="number" className="input input-bordered w-full" {...register('maxPeople')} />
-                                    </div>
+
+
                                     <div>
                                         <label className="label">{t("Front View Picture")}</label>
                                         <input
@@ -378,21 +486,7 @@ const RoomManager: React.FC = () => {
                                             ))}
                                         </div>
                                     </div>
-                                    <div>
-                                        <label className="label">{t("Number of Beds")}</label>
-                                        <input type="number" className="input input-bordered w-full" {...register('numberOfBeds')} />
-                                    </div>
-                                    <div>
-                                        <label className="label">{t("Room Type")}</label>
-                                        <select className="select select-bordered w-full" {...register('roomType')}>
-                                            <option value="Tripple">{t("Tripple")}</option>
-                                            <option value="Small Double">{t("Small Double")}</option>
-                                            <option value="Twin">{t("Twin")}</option>
-                                            <option value="Single">{t("Single")}</option>
-                                            <option value="Double">{t("Double")}</option>
-                                            <option value="Family">{t("Family")}</option>
-                                        </select>
-                                    </div>
+
                                     <div>
                                         <label className="label">{t("Status")}</label>
                                         <select className="select select-bordered w-full" {...register('status')}>
