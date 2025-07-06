@@ -50,7 +50,7 @@ const defaultValues = {
 };
 
 const AmenityChoices = [
-    "Room 20m²", "Room 26m²", "Toothbrush", "Shampoo", "Slippers", "Room 16m²", "Room 24m²", "Room 28m²", "Double Beds", "Single Bed", "Tripple", "Smart TV", "Sauna", "Room Service", "Bath tab",
+    "Room 20m²","Room 23m²","toiletries","Cooling fun","clothes rack","bedside table","Room 22m²","safe box", "Room 26m²","Room 19m²", "Toothbrush", "Shampoo", "Slippers", "Room 16m²", "Room 24m²", "Room 28m²", "Double Beds", "Single Bed", "Tripple", "Smart TV", "Sauna", "Room Service", "Bath tab",
     "AC", "Booking", "Storage", "Outdoor Kitchen", "Towels",
     "Big Wardrobe", "Cable TV", "Family Room", "Shower", "Breakfast", "Soundproof", "Dryer",
 ];
@@ -119,7 +119,7 @@ const RoomManager: React.FC = () => {
 
     //configurations
     const [configurations, setConfigurations] = useState<RoomConfiguration[]>([
-        { roomType: 'Single', price: 0, numberOfBeds: 1, bedType: '', maxPeople: 1 }
+        { roomType: '', price: 0, numberOfBeds: 1, bedType: '', maxPeople: 1 }
     ]);
 
     const updateConfigField = <K extends keyof RoomConfiguration>(
@@ -397,10 +397,12 @@ const RoomManager: React.FC = () => {
                                                         <select className="select select-bordered w-full" value={config.roomType}
                                                             onChange={(e) => updateConfigField(idx, 'roomType', e.target.value)}>
                                                             <option value="">{t("Choose room type")}</option>
-                                                            <option value="Tripple">{t("Tripple")}</option>
+                                                            <option value="Triple">{t("Triple")}</option>
                                                             <option value="Small Double">{t("Small Double")}</option>
                                                             <option value="Single">{t("Single")}</option>
-                                                            <option value="Double">{t("Family")}</option>
+                                                            <option value="Double">{t("Double")}</option>
+                                                            <option value="Twin">{t("Twin")}</option>
+                                                            <option value="Family">{t("Family")}</option>
                                                         </select>
                                                     </div>
                                                     <div>
