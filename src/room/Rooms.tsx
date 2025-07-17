@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import UseRoomStore from "../zustand/UseRoomStore";
 import { useCart } from "../context/CartContext";
-import Search from "../components/Search";
+// import Search from "../components/Search";
 import { useTranslation } from "react-i18next";
 
 interface RoomConfiguration {
@@ -79,7 +79,7 @@ const Rooms = () => {
   return (
     <div className="mt-28">
       <Header pageName={t("Our Rooms")} />
-      <Search />
+      {/* <Search /> */}
 
       {loading ? (
         <div className="px-4 lg:px-20 space-y-10 mt-10">
@@ -187,7 +187,7 @@ const Rooms = () => {
                   </p>
                   <p>{t("Deposit")}: <span className="text-gray-100">{t("Not required")}</span></p>
                   <p>{t("Beds")}: <span className="text-gray-100">{selectedConfig.numberOfBeds}</span></p>
-                  <p>{t("Bed Type")}: <span className="text-gray-100">{selectedConfig.bedType}</span></p>
+                  <p>{t("Bed Type")}: <span className="text-gray-100">{selectedConfig.bedType}{selectedConfig.roomType === "Family" ? <span className="text-sm ml-2">- 1 King for the parents and 2 queens for the children</span> : null}</span></p>
                 </div>
 
                 <Link

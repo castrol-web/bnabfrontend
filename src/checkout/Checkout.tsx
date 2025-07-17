@@ -8,7 +8,7 @@ import { format, isBefore, differenceInDays } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { toast, ToastContainer } from "react-toastify";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion"; // added AnimatePresence
 import { useAuth } from "../hooks/UseAuth";
 import EmptyCart from "../context/EmptyCart";
 import { useTranslation } from "react-i18next";
@@ -20,7 +20,7 @@ interface LocationState {
 }
 
 function Checkout() {
-  const { cart, clearCart } = useCart();
+  const { cart, clearCart, removeFromCart } = useCart();
   const [specialRequests, setSpecialRequest] = useState<string>("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [guestCounts, setGuestCounts] = useState<Record<string, number>>({});
@@ -29,13 +29,22 @@ function Checkout() {
   const [validationError, setValidationError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // New state to track roomsToBook with removal
+  const [roomsToBook, setRoomsToBook] = useState<any[]>([]);
+
   const location = useLocation();
   const state = location.state as LocationState;
   const directBooking = state?.directBooking;
   const roomFromDirect = state?.room;
 
-  // Compose rooms to book, either direct single booking or full cart
-  const roomsToBook = directBooking && roomFromDirect ? [roomFromDirect] : cart;
+  // Compose initial roomsToBook once
+  useEffect(() => {
+    if (directBooking && roomFromDirect) {
+      setRoomsToBook([roomFromDirect]);
+    } else {
+      setRoomsToBook(cart);
+    }
+  }, [directBooking, roomFromDirect, cart]);
 
   const { isAuthenticated, LoadingUser, user } = useAuth();
   const navigate = useNavigate();
@@ -83,6 +92,43 @@ function Checkout() {
       ...prev,
       [roomKey]: [ranges.selection],
     }));
+  };
+  const handleRemoveRoom = (roomKey: string) => {
+    toast.info(
+      <div>
+        {t("Are you sure you want to remove this room?")}
+        <div className="mt-2 flex justify-end gap-2">
+          <button
+            onClick={() => toast.dismiss()}
+            className="btn btn-sm btn-outline"
+          >
+            {t("Cancel")}
+          </button>
+          <button
+            onClick={() => {
+              // Remove from local roomsToBook state
+              setRoomsToBook((prev) =>
+                prev.filter(
+                  (room) =>
+                    `${room._id}-${room.selectedConfiguration.roomType}` !== roomKey
+                )
+              );
+
+              // Remove from global cart state as well
+              const [roomId, roomType] = roomKey.split("-");
+              removeFromCart(roomId, roomType);
+
+              toast.dismiss();
+              toast.success(t("Room removed from booking"));
+            }}
+            className="btn btn-sm btn-error"
+          >
+            {t("Remove")}
+          </button>
+        </div>
+      </div>,
+      { autoClose: false, closeOnClick: false }
+    );
   };
 
   const handleConfirmBooking = async () => {
@@ -165,7 +211,7 @@ function Checkout() {
     }
   };
 
-  if (!directBooking && cart.length === 0) return <EmptyCart />;
+  if (!directBooking && roomsToBook.length === 0) return <EmptyCart />;
 
   return (
     <div className="px-4 md:px-16 mt-32 max-w-5xl mx-auto">
@@ -174,87 +220,99 @@ function Checkout() {
       </h1>
 
       <div className="grid gap-6">
-        {roomsToBook.map((room) => {
-          const roomKey = `${room._id}-${room.selectedConfiguration.roomType}`;
-          const range = dateRanges[roomKey]?.[0];
-          return (
-            <motion.div
-              key={roomKey}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="rounded-xl border border-base-300 p-6 shadow-sm bg-base-500"
-            >
-              <h2 className="text-xl font-semibold text-primary mb-1">{t(room.title)}</h2>
-              <p className="text-sm text-gray-400">
-                {t(room.selectedConfiguration.roomType)} • {t("Max people")}: {room.selectedConfiguration.maxPeople}
-              </p>
+        <AnimatePresence>
+          {roomsToBook.map((room) => {
+            const roomKey = `${room._id}-${room.selectedConfiguration.roomType}`;
+            const range = dateRanges[roomKey]?.[0];
+            return (
+              <motion.div
+                key={roomKey}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -50, transition: { duration: 0.3 } }}
+                transition={{ duration: 0.4 }}
+                className="rounded-xl border border-base-300 p-6 shadow-sm bg-base-500 relative"
+              >
+                <h2 className="text-xl font-semibold text-primary mb-1">{t(room.title)}</h2>
+                <p className="text-sm text-gray-400">
+                  {t(room.selectedConfiguration.roomType)} • {t("Max people")}: {room.selectedConfiguration.maxPeople}
+                </p>
 
-              <div className="mt-4 sm:flex-row sm:items-center gap-4 flex flex-wrap items-center">
-                <div>
-                  <label className="label">
-                    <span className="label-text">{t("Number of Guests")}</span>
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={room.selectedConfiguration.maxPeople}
-                    value={guestCounts[roomKey] || 1}
-                    onChange={(e) => handleGuestChange(roomKey, e.target.value, room.selectedConfiguration.maxPeople)}
-                    className="input input-bordered w-24 text-gray-800"
-                  />
-                </div>
-
-                <div className="flex-1 ml-4">
-                  <label className="label">
-                    <span className="label-text">{t("Special Requests")}</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="specialRequests"
-                    placeholder={t("Enter special request if any")}
-                    className="input input-bordered w-full text-gray-800"
-                    onChange={(e) => setSpecialRequest(e.target.value)}
-                    value={specialRequests}
-                  />
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <label className="label">
-                  <span className="label-text">{t("Check-in - Check-out")}</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setCalendarOpen((prev) => ({ ...prev, [roomKey]: !prev[roomKey] }))
-                  }
-                  className="btn btn-outline w-full text-left"
-                >
-                  {range?.startDate && range?.endDate
-                    ? `${format(range.startDate, "MMM dd")} - ${format(range.endDate, "MMM dd, yyyy")}`
-                    : t("Select dates")}
-                </button>
-
-                {calendarOpen[roomKey] && (
-                  <div className="relative z-30 mt-2">
-                    <DateRange
-                      editableDateInputs
-                      onChange={(ranges) => handleDateChange(roomKey, ranges)}
-                      moveRangeOnFirstSelection={false}
-                      ranges={dateRanges[roomKey]}
-                      minDate={new Date()}
+                <div className="mt-4 sm:flex-row sm:items-center gap-4 flex flex-wrap items-center">
+                  <div>
+                    <label className="label">
+                      <span className="label-text">{t("Number of Guests")}</span>
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={room.selectedConfiguration.maxPeople}
+                      value={guestCounts[roomKey] || 1}
+                      onChange={(e) => handleGuestChange(roomKey, e.target.value, room.selectedConfiguration.maxPeople)}
+                      className="input input-bordered w-24 text-gray-800"
                     />
                   </div>
-                )}
-              </div>
 
-              <div className="mt-6 flex justify-between">
-                <span className="text-lg font-medium text-primary">${room.selectedConfiguration.price} {t("/night")}</span>
-              </div>
-            </motion.div>
-          );
-        })}
+                  <div className="flex-1 ml-4">
+                    <label className="label">
+                      <span className="label-text">{t("Special Requests")}</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="specialRequests"
+                      placeholder={t("Enter special request if any")}
+                      className="input input-bordered w-full text-gray-800"
+                      onChange={(e) => setSpecialRequest(e.target.value)}
+                      value={specialRequests}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <label className="label">
+                    <span className="label-text">{t("Check-in - Check-out")}</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCalendarOpen((prev) => ({ ...prev, [roomKey]: !prev[roomKey] }))
+                    }
+                    className="btn btn-outline w-full text-left"
+                  >
+                    {range?.startDate && range?.endDate
+                      ? `${format(range.startDate, "MMM dd")} - ${format(range.endDate, "MMM dd, yyyy")}`
+                      : t("Select dates")}
+                  </button>
+
+                  {calendarOpen[roomKey] && (
+                    <div className="relative z-30 mt-2">
+                      <DateRange
+                        editableDateInputs
+                        onChange={(ranges) => handleDateChange(roomKey, ranges)}
+                        moveRangeOnFirstSelection={false}
+                        ranges={dateRanges[roomKey]}
+                        minDate={new Date()}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-6 flex justify-between items-center">
+                  <span className="text-lg font-medium text-primary">${room.selectedConfiguration.price} {t("/night")}</span>
+
+                  {/* Remove button */}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveRoom(roomKey)}
+                    className="btn btn-error btn-sm ml-4"
+                  >
+                    {t("Remove")}
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
 
       <div className="mt-10 card bg-base-500 shadow-xl p-6">

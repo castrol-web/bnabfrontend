@@ -4,7 +4,7 @@ type headerProps ={
 
 function Header({pageName}:headerProps) {
     return (
-        <div className="items-center mt-16">
+        <div className="items-center lg:mt-24 mt-28">
             <div
                 className="hero h-60 hero-custom-bg" 
             >
