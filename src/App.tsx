@@ -19,6 +19,7 @@ import Gallery from "./components/gallery/Gallery";
 import GalleryManager from "./Admin/Rooms/gallery/GalleryManager";
 import AdminLayout from "./Admin/dashboard/AdminLayout";
 import Dashboard from "./Admin/dashboard/Dashboard";
+import FounderStory from "./components/testimonial/FounderStory";
 function App() {
   return (
     <div className="bg-[#0f0c0c] min-h-screen text-[#FFF0DC]">
@@ -31,6 +32,7 @@ function App() {
           <Route path="/room-details/:id" element={<> <Navbar /><RoomDetails /><Footer /><ChatWidget /><ScrollButton /></>} />
           <Route path="/about" element={<> <Navbar /><About /><Footer /><ChatWidget /><ScrollButton /></>} />
           <Route path="/contact" element={<> <Navbar /><Contact /><Footer /><ChatWidget /><ScrollButton /></>} />
+          <Route path="/founder-story" element={<> <Navbar /><FounderStory /><Footer /><ChatWidget /><ScrollButton /></>} />
           <Route path="/login" element={<> <Navbar /><Login /><Footer /><ChatWidget /><ScrollButton /></>} />
           <Route path="/signup" element={<> <Navbar /><Signup /><Footer /><ChatWidget /><ScrollButton /></>} />
           <Route path="/gallery" element={<> <Navbar /><Gallery /><Footer /><ChatWidget /><ScrollButton /></>} />

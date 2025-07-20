@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 function About() {
   const { t } = useTranslation()
   return (
-    <div className="mt-32">
+    <div>
       <Header pageName={t("ABOUT US")} />
 
       {/* Intro Section */}
@@ -36,7 +36,7 @@ function About() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <MdWifi className="text-4xl mb-4" />
+              <MdWifi className="text-4xl mb-4 text-blue-500" />
               <h3 className="text-xl font-semibold mb-2">{t("Comfort & Connectivity")}</h3>
               <p>
                 {t("Relax in shared lounges with high-speed Wi-Fi, Smart TVs, and stunning Mount Kilimanjaro views.")}

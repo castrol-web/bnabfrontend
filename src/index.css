@@ -2,7 +2,7 @@
 @plugin "daisyui";
 @layer utilities {
   .hero-custom-bg {
-    background-image: url('src/assets/header.jpg');
+    background-image: url('/images/header.jpg');
     background-size: cover;
     background-position: center;
   }

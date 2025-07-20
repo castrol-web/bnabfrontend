@@ -115,7 +115,7 @@ function Gallery() {
 
       {selectedImage && (
         <div
-          className="z-30 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center px-4"
+          className="z-30 fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center px-4 mt-28.5"
           {...swipeHandlers}
         >
           <div className="relative w-full max-w-4xl">
