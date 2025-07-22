@@ -2,6 +2,7 @@ import {
   FaFacebook,
   FaWhatsapp,
   FaInstagram,
+   FaTiktok 
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -49,6 +50,11 @@ function Footer() {
             <div className="bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] rounded-lg p-1">
               <a href="https://www.instagram.com/bbhotel88?igsh=OHQ4eHBhMXQ5eWtp" aria-label="Instagram">
                 <FaInstagram className="text-xl text-white hover:text-slate-50" />
+              </a>
+            </div>
+            <div className="bg-gradient-to-tr from-[#69C9D0] via-[#EE1D52] to-[#010101] rounded-lg p-1">
+              <a href="https://www.tiktok.com/@bb.hotel4t" aria-label="Tiktok">
+                <FaTiktok  className="text-xl text-white hover:text-slate-50" />
               </a>
             </div>
           </div>

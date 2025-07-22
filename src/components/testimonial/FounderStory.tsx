@@ -50,19 +50,23 @@ function FounderStory() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-sm font-medium mt-4">
               <div className="bg-base-100/10 p-4 rounded-xl">
                 <FaMountain className="text-xl mx-auto mb-1 text-orange-400" />
-                Kilimanjaro Treks
+                Accomodation
               </div>
               <div className="bg-base-100/10 p-4 rounded-xl">
                 <FaSafari className="text-xl mx-auto mb-1 text-yellow-500" />
-                Serengeti Safaris
+                Restaurant
               </div>
               <div className="bg-base-100/10 p-4 rounded-xl">
                 <MdBeachAccess className="text-xl mx-auto mb-1 text-teal-400" />
-                Zanzibar Holidays
+                Bar
               </div>
               <div className="bg-base-100/10 p-4 rounded-xl">
                 <MdPeople className="text-xl mx-auto mb-1 text-green-400" />
-                Cultural Tours
+                coffee cafe
+              </div>
+              <div className="bg-base-100/10 p-4 rounded-xl">
+                <MdPeople className="text-xl mx-auto mb-1 text-green-400" />
+                Laundry
               </div>
             </div>
 

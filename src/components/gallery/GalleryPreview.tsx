@@ -2,17 +2,16 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-
-import serengeti from "../../assets/serengeti.jpg";
-import lion from "../../assets/lion.jpg";
-import waterfall from "../../assets/waterfall.jpg";
-import daytour from "../../assets/daytour.avif";
+import reception from "../../assets/reception.jpeg";
+import parking from "../../assets/parking.jpeg";
+import room1 from "../../assets/room1.jpeg";
+import room2 from "../../assets/room2.jpeg";
 
 const images = [
-  serengeti,
-  lion,
-  waterfall,
-  daytour,
+  parking,
+  reception,
+  room1,
+  room2,
 ];
 
 const GalleryPreview = () => {

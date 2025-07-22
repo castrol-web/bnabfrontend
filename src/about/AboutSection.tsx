@@ -50,9 +50,12 @@ const AboutSection = () => {
         {/* Features List */}
         <ul className="space-y-2 mt-6">
           {[
-            "Restaurant and Bar",
-            "CCTV security",
-            "Free Parking",
+            "Accommodation",
+            "Restaurant",
+            "Bar",
+            "Coffee Cafe",
+            "Laudry Services",
+            "Free parking",
           ].map((item, index) => (
             <li key={index} className="flex items-center gap-2">
               <FaCheckCircle className="text-orange-500" /> {t(item)}
