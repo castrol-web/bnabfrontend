@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { FaQuoteLeft, FaQuoteRight, FaMountain, FaSafari } from "react-icons/fa";
-import { MdBeachAccess, MdPeople } from "react-icons/md";
-import bart from "../../assets/bart.jpeg"
+import { FaQuoteLeft, FaGlassMartiniAlt, FaHotel, FaQuoteRight, FaUtensils } from "react-icons/fa";
+import { DiCoffeescript } from "react-icons/di";
+import { GiWashingMachine } from "react-icons/gi";
+import bart2 from "../../assets/bart2.jpeg"
 
 function FounderStory() {
   return (
@@ -15,9 +16,9 @@ function FounderStory() {
         >
           <div className="relative">
             <img
-              src={bart}
+              src={bart2}
               alt="Bart Ketelaars"
-              className="rounded-2xl shadow-lg w-full object-cover max-h-[500px]"
+              className="rounded-2xl shadow-lg w-full object-cover max-h-[800px]"
             />
             <div className="absolute bottom-4 left-4 bg-white text-black px-4 py-2 rounded-xl font-semibold text-sm shadow-lg">
               Bart Ketelaars, Founder & CEO
@@ -48,27 +49,32 @@ function FounderStory() {
 
             {/* Highlights */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-sm font-medium mt-4">
-              <div className="bg-base-100/10 p-4 rounded-xl">
-                <FaMountain className="text-xl mx-auto mb-1 text-orange-400" />
-                Accomodation
+              <div className="bg-base-100/10 py-4 rounded-xl">
+                <FaHotel className="text-2xl mx-auto mb-1 text-[#FF7F50]" />
+                Accommodation
               </div>
+
               <div className="bg-base-100/10 p-4 rounded-xl">
-                <FaSafari className="text-xl mx-auto mb-1 text-yellow-500" />
+                <FaUtensils className="text-2xl mx-auto mb-1 text-[#FFA500]" />
                 Restaurant
               </div>
+
               <div className="bg-base-100/10 p-4 rounded-xl">
-                <MdBeachAccess className="text-xl mx-auto mb-1 text-teal-400" />
+                <FaGlassMartiniAlt className="text-2xl mx-auto mb-1 text-[#00BFA6]" />
                 Bar
               </div>
+
               <div className="bg-base-100/10 p-4 rounded-xl">
-                <MdPeople className="text-xl mx-auto mb-1 text-green-400" />
-                coffee cafe
+                <DiCoffeescript className="text-2xl mx-auto mb-1 text-[#6F4E37]" />
+                Coffee Café
               </div>
+
               <div className="bg-base-100/10 p-4 rounded-xl">
-                <MdPeople className="text-xl mx-auto mb-1 text-green-400" />
+                <GiWashingMachine className="text-2xl mx-auto mb-1 text-[#1E90FF]" />
                 Laundry
               </div>
             </div>
+
 
             <div className="text-yellow-400 flex items-center justify-end text-lg mt-4">
               <FaQuoteRight />

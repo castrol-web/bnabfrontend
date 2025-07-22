@@ -9,7 +9,9 @@ import { useTranslation } from "react-i18next";
 function MainHeader() {
   const [index, setIndex] = useState(0);
   const { t } = useTranslation();
-  const images = [bnb1, bnbpic, bnb2,bnb3];
+
+  const images = [bnb1, bnbpic, bnb2, bnb3];
+
   const content = [
     {
       heading: "Welcome to B&B HOTEL Moshi",
@@ -49,14 +51,12 @@ function MainHeader() {
     },
   ];
 
-
-
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % images.length);
     }, 15000);
     return () => clearInterval(interval);
-  }, []);
+  }, [images.length]);
 
   return (
     <>
@@ -121,7 +121,7 @@ function MainHeader() {
                   transition={{ duration: 1, delay: 1 }}
                 >
                   {content[index].list.map((item, i) => (
-                    <p key={`list-${i}`}>{t(item)}</p>
+                    <li key={`list-${i}`}>{t(item)}</li>
                   ))}
                 </motion.ul>
               )}

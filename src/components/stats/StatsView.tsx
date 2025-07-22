@@ -1,7 +1,7 @@
 import StatCard from "./StatCard";
 import { ImUserCheck } from "react-icons/im";
+import { FaBed} from "react-icons/fa";
 import { MdOutlineRoomService } from "react-icons/md";
-import {GiLion } from "react-icons/gi";
 import { useTranslation } from "react-i18next";
 
 function StatsView() {
@@ -10,16 +10,16 @@ function StatsView() {
         <section className="py-16">
             <div className="container mx-auto px-4 grid md:grid-cols-3 gap-8">
                 <StatCard
-                    icon={GiLion}
+                    icon={FaBed}
                     end={300}
-                    title={t("Successful Organized safaris")}
-                    description={t("Great impact on safaris.")}
+                    title={t("Accommodations")}
+                    description={t("Elegant Rooms, Memorable Stays.")}
                     color="text-red-500"
                 />
                 <StatCard
                     icon={MdOutlineRoomService}
                     end={200}
-                    title={t("Rooom services")}
+                    title={t("Room services")}
                     description={t("Remarkable experiences on our Room services")}
                     color="text-pink-500"
                 />
