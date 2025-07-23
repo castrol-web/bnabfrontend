@@ -53,7 +53,7 @@ function Footer() {
               </a>
             </div>
             <div className="bg-gradient-to-tr from-[#69C9D0] via-[#EE1D52] to-[#010101] rounded-lg p-1">
-              <a href="https://www.tiktok.com/@bb.hotel4t" aria-label="Tiktok">
+              <a href="https://www.tiktok.com/@bb.hotel4?_t=ZM-8yGqHJm8CLV&_r=1" aria-label="Tiktok">
                 <FaTiktok  className="text-xl text-white hover:text-slate-50" />
               </a>
             </div>
