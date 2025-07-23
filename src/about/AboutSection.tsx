@@ -14,7 +14,7 @@ const AboutSection = () => {
       <div className="relative w-full lg:w-1/2">
         <motion.img
           src={home1}
-          alt={t("bnb thumbnails")}
+          alt="bnb thumbnails"
           className="rounded-2xl w-full shadow-xl"
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -22,7 +22,7 @@ const AboutSection = () => {
         />
         <motion.img
           src={home2}
-          alt={t("bnb inside pictures")}
+          alt="bnb inside pictures"
           className="absolute bottom-[-40px] left-[30px] w-1/2 rounded-xl shadow-lg border-4 border-[#be7f2c]"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
