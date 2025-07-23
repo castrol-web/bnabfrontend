@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { MdWifi, MdLocationOn, MdSecurity } from "react-icons/md";
 import Header from "../components/Header";
-import StatsView from "../components/stats/StatsView";
 import Hero from "../components/hero/Hero";
 import { useTranslation } from "react-i18next";
 
@@ -73,9 +72,6 @@ function About() {
           </div>
         </div>
       </section>
-
-      {/* Stats Section */}
-      <StatsView />
       <Hero />
     </div>
   );
